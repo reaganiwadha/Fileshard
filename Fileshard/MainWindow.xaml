@@ -3,11 +3,50 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:skia="clr-namespace:SkiaSharp.Views.WPF;assembly=SkiaSharp.Views.WPF"
+        xmlns:skia="clr-namespace:SkiaSharp.Views.WPF;assembly=SkiaSharp.Views.WPF" 
+        xmlns:local="clr-namespace:Fileshard.Frontend.Components"
         mc:Ignorable="d"
         Title="I can't believe it's not WinUI" Height="450" Width="800">
-    <Grid Name="DropGrid" AllowDrop="True" Drop="DropGrid_Drop">
-        <TextBlock Text="Drag files here" HorizontalAlignment="Center" VerticalAlignment="Center" Width="100"/>
-        <skia:SKElement x:Name="skElement" PaintSurface="OnPaintSurface" IgnorePixelScaling="True" />
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="200" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <Menu Grid.Row="0" Grid.ColumnSpan="2">
+            <MenuItem Header="_File">
+                <MenuItem Header="_Open" />
+                <MenuItem Header="_Save" />
+                <Separator />
+                <MenuItem Header="_Exit" />
+            </MenuItem>
+            <MenuItem Header="_Edit">
+                <MenuItem Header="_Cut" />
+                <MenuItem Header="_Copy" />
+                <MenuItem Header="_Paste" />
+            </MenuItem>
+            <MenuItem Header="_Help">
+                <MenuItem Header="_About" />
+            </MenuItem>
+        </Menu>
+
+        <StackPanel Grid.Row="1" Grid.Column="0">
+            <TextBlock Text="Additional Content" />
+        </StackPanel>
+
+        <Grid Name="DropGrid" AllowDrop="True" Drop="DropGrid_Drop" Grid.Row="1" Grid.Column="1">
+            <local:SkiaImageViewer x:Name="skiaImageViewer" />
+        </Grid>
+
+        <StatusBar Grid.Row="2" Grid.ColumnSpan="2">
+            <StatusBarItem>
+                <TextBlock x:Name="StatusTextBlock" Text="Ready" />
+            </StatusBarItem>
+        </StatusBar>
     </Grid>
 </Window>
