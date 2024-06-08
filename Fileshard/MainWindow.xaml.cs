@@ -7,6 +7,8 @@ using ServiceWire.NamedPipes;
 using Fileshard.Shared.IPC;
 using Fileshard.Shared.Structs;
 using System.Collections.ObjectModel;
+using Fileshard.Frontend.Components;
+using System.Windows.Controls.Primitives;
 
 namespace Fileshard
 {
@@ -18,6 +20,8 @@ namespace Fileshard
         private List<Database> _databases;
 
         public ObservableCollection<FileItem> Files { get; set; }
+        public int RowCount { get; set; }
+        public int ColumnCount { get; set; }
 
         public MainWindow()
         {
@@ -43,13 +47,6 @@ namespace Fileshard
             DataContext = this;
         }
 
-        public class FileItem
-        {
-            public string Name { get; set; }
-            public string Path { get; set; }
-            public BitmapImage Icon { get; set; }
-        }
-
         private void DropGrid_Drop(object sender, DragEventArgs e)
         {
             if (e.Data.GetDataPresent(DataFormats.FileDrop))
@@ -61,13 +58,7 @@ namespace Fileshard
                     string extension = Path.GetExtension(file).ToLower();
 
                     if (extension == ".jpg" || extension == ".png") { 
-                        BitmapImage bitmapImage = new BitmapImage();
-                        bitmapImage.BeginInit();
-                        bitmapImage.UriSource = new Uri(file, UriKind.Absolute);
-                        bitmapImage.CacheOption = BitmapCacheOption.OnLoad;
-                        bitmapImage.EndInit();
-
-                        Files.Add(new FileItem { Name = Path.GetFileName(file), Path = file, Icon = bitmapImage });
+                        Files.Add(new FileItem { Name = Path.GetFileName(file), Path = file, Icon = null });
                         this.StatusTextBlock.Text = $"Loaded {Path.GetFileName(file)}";
                     } 
                     else

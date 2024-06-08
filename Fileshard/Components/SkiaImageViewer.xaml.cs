@@ -6,7 +6,7 @@ namespace Fileshard.Frontend.Components
 {
     public partial class SkiaImageViewer : UserControl
     {
-        private SKData? _skData;
+        private SKBitmap? _skBitmap;
 
         public SkiaImageViewer()
         {
@@ -15,23 +15,21 @@ namespace Fileshard.Frontend.Components
 
         public void LoadBitmap(SKData sKData)
         {
-            if (this._skData != null)
+            if (this._skBitmap != null)
             {
-                this._skData.Dispose();
+                this._skBitmap.Dispose();
             }
 
-            this._skData = sKData;
+            var bitmap = SKBitmap.Decode(sKData);
+            sKData.Dispose();
+
+            this._skBitmap = bitmap;
             skElement.InvalidateVisual();
         }
 
         private void OnPaintSurface(object sender, SKPaintSurfaceEventArgs e)
         {
-            if (_skData == null)
-            {
-                return;
-            }
-
-            var bitmap = SKBitmap.Decode(_skData);
+            if (_skBitmap == null) return;
 
             var canvas = e.Surface.Canvas;
 
@@ -43,18 +41,17 @@ namespace Fileshard.Frontend.Components
 
             canvas.Clear(SKColors.White);
 
-            float scale = Math.Min((float)e.Info.Width / bitmap.Width, (float)e.Info.Height / bitmap.Height);
+            float scale = Math.Min((float)e.Info.Width / _skBitmap.Width, (float)e.Info.Height / _skBitmap.Height);
 
-            float scaledWidth = scale * bitmap.Width;
-            float scaledHeight = scale * bitmap.Height;
+            float scaledWidth = scale * _skBitmap.Width;
+            float scaledHeight = scale * _skBitmap.Height;
 
             float x = (e.Info.Width - scaledWidth) / 2;
             float y = (e.Info.Height - scaledHeight) / 2;
 
             var destRect = new SKRect(x, y, x + scaledWidth, y + scaledHeight);
 
-            canvas.DrawBitmap(bitmap, destRect, paint);
-            bitmap.Dispose();
+            canvas.DrawBitmap(_skBitmap, destRect, paint);
         }
     }
 }

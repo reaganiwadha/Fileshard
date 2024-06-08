@@ -7,15 +7,6 @@
         xmlns:local="clr-namespace:Fileshard.Frontend.Components"
         mc:Ignorable="d"
         Title="I can't believe it's not WinUI" Height="450" Width="800">
-    <Window.Resources>
-        <DataTemplate x:Key="FileTemplate">
-            <StackPanel Margin="10" Width="100">
-                <Image Source="{Binding Icon}" Width="48" Height="48" HorizontalAlignment="Center"/>
-                <TextBlock Text="{Binding Name}" TextAlignment="Center" TextWrapping="Wrap"/>
-            </StackPanel>
-        </DataTemplate>
-    </Window.Resources>
-
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -60,12 +51,18 @@
         <GridSplitter Grid.Row="1" Grid.Column="1" Width="5" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="Gray" />
 
         <Grid Name="DropGrid" AllowDrop="True" Drop="DropGrid_Drop" Grid.Row="1" Grid.Column="2">
-            <ListBox Name="ListBox" ItemsSource="{Binding Files}" ItemTemplate="{StaticResource FileTemplate}" SelectionChanged="ListBox_SelectionChanged">
+            <ListBox Name="ListBox" ItemsSource="{Binding Files}" SelectionChanged="ListBox_SelectionChanged">
                 <ListBox.ItemsPanel>
                     <ItemsPanelTemplate>
-                        <WrapPanel />
+                        <!-- <UniformGrid Rows="0" Columns="6" /> -->
+                        <UniformGrid Rows="{Binding RowCount}" Columns="{Binding ColumnCount}" />
                     </ItemsPanelTemplate>
                 </ListBox.ItemsPanel>
+                <ListBox.ItemTemplate>
+                    <DataTemplate>
+                        <local:ObjectListBoxItem Width="100" Height="100"/>
+                    </DataTemplate>
+                </ListBox.ItemTemplate>
             </ListBox>
         </Grid>
 
