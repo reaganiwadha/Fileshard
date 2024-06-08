@@ -3,6 +3,9 @@ using System.Windows;
 using System.IO;
 using Fileshard.Frontend.Helpers;
 using System.Windows.Media;
+using ServiceWire.NamedPipes;
+using Fileshard.Shared.IPC;
+using Fileshard.Shared.Structs;
 
 namespace Fileshard
 {
@@ -11,9 +14,18 @@ namespace Fileshard
     /// </summary>
     public partial class MainWindow : Window
     {
+        private List<Database> _databases;
+
         public MainWindow()
         {
             InitializeComponent();
+
+
+            using (var client = new NpClient<DatabaseIPC>(new NpEndPoint("fileshard")))
+            {
+                _databases = client.Proxy.GetDatabases();
+                _databases.ForEach(db => this.StatusTextBlock.Text += $"{db.Guid}\n");
+            }
         }
 
         private void DropGrid_Drop(object sender, DragEventArgs e)
