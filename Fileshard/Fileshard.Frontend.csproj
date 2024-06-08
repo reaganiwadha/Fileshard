@@ -16,6 +16,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="FluentWPF" Version="0.10.2" />
     <PackageReference Include="ServiceWire" Version="5.5.4" />
     <PackageReference Include="SkiaSharp.Views.Desktop.Common" Version="2.88.8" />
     <PackageReference Include="SkiaSharp.Views.WPF" Version="2.88.8" />

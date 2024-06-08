@@ -3,8 +3,7 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:skia="clr-namespace:SkiaSharp.Views.WPF;assembly=SkiaSharp.Views.WPF" 
-        xmlns:local="clr-namespace:Fileshard.Frontend.Components"
+        xmlns:local="clr-namespace:Fileshard.Frontend.Components" xmlns:Local="clr-namespace:Fileshard.Frontend.Helpers"
         mc:Ignorable="d"
         Title="I can't believe it's not WinUI" Height="450" Width="800">
     <Grid>
@@ -51,11 +50,13 @@
         <GridSplitter Grid.Row="1" Grid.Column="1" Width="5" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="Gray" />
 
         <Grid Name="DropGrid" AllowDrop="True" Drop="DropGrid_Drop" Grid.Row="1" Grid.Column="2">
-            <ListBox Name="ListBox" ItemsSource="{Binding Files}" SelectionChanged="ListBox_SelectionChanged">
+            <ListBox Name="ListBox" ItemsSource="{Binding Files}" SelectionChanged="ListBox_SelectionChanged" HorizontalContentAlignment="Stretch">
+                <ListBox.Resources>
+                    <Local:DimentionConverter x:Key="Converter" />
+                </ListBox.Resources>
                 <ListBox.ItemsPanel>
                     <ItemsPanelTemplate>
-                        <!-- <UniformGrid Rows="0" Columns="6" /> -->
-                        <UniformGrid Rows="{Binding RowCount}" Columns="{Binding ColumnCount}" />
+                        <UniformGrid Rows="0" Columns="{Binding RelativeSource={RelativeSource AncestorType=ListBox},Path=ActualWidth,Converter={StaticResource ResourceKey=Converter},ConverterParameter=120}" />
                     </ItemsPanelTemplate>
                 </ListBox.ItemsPanel>
                 <ListBox.ItemTemplate>
