@@ -6,51 +6,55 @@ namespace Fileshard.Frontend.Components
 {
     public partial class SkiaImageViewer : UserControl
     {
-        private SKBitmap bitmap;
+        private SKData? _skData;
 
         public SkiaImageViewer()
         {
             InitializeComponent();
         }
 
-        public void LoadBitmap(SKBitmap newBitmap)
+        public void LoadBitmap(SKData sKData)
         {
-            bitmap = newBitmap;
+            if (this._skData != null)
+            {
+                this._skData.Dispose();
+            }
+
+            this._skData = sKData;
             skElement.InvalidateVisual();
         }
 
         private void OnPaintSurface(object sender, SKPaintSurfaceEventArgs e)
         {
-            if (bitmap == null)
+            if (_skData == null)
             {
                 return;
             }
 
+            var bitmap = SKBitmap.Decode(_skData);
+
             var canvas = e.Surface.Canvas;
 
-            // Create paint object with antialiasing enabled
             var paint = new SKPaint
             {
                 IsAntialias = false,
-                FilterQuality = SKFilterQuality.High // Set the filter quality to high for smoother scaling
+                FilterQuality = SKFilterQuality.High 
             };
 
-            // Calculate the scaling factor to fit the image within the SKElement
+            canvas.Clear(SKColors.White);
+
             float scale = Math.Min((float)e.Info.Width / bitmap.Width, (float)e.Info.Height / bitmap.Height);
 
-            // Calculate the image dimensions after scaling
             float scaledWidth = scale * bitmap.Width;
             float scaledHeight = scale * bitmap.Height;
 
-            // Center the image in the SKElement
             float x = (e.Info.Width - scaledWidth) / 2;
             float y = (e.Info.Height - scaledHeight) / 2;
 
-            // Define the destination rectangle
             var destRect = new SKRect(x, y, x + scaledWidth, y + scaledHeight);
 
-            // Draw bitmap with smooth antialiasing
             canvas.DrawBitmap(bitmap, destRect, paint);
+            bitmap.Dispose();
         }
     }
 }

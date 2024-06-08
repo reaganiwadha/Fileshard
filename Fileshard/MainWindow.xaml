@@ -7,6 +7,15 @@
         xmlns:local="clr-namespace:Fileshard.Frontend.Components"
         mc:Ignorable="d"
         Title="I can't believe it's not WinUI" Height="450" Width="800">
+    <Window.Resources>
+        <DataTemplate x:Key="FileTemplate">
+            <StackPanel Margin="10" Width="100">
+                <Image Source="{Binding Icon}" Width="48" Height="48" HorizontalAlignment="Center"/>
+                <TextBlock Text="{Binding Name}" TextAlignment="Center" TextWrapping="Wrap"/>
+            </StackPanel>
+        </DataTemplate>
+    </Window.Resources>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto" />
@@ -14,11 +23,12 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="200" />
+            <ColumnDefinition Width="200" MinWidth="100" />
+            <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
 
-        <Menu Grid.Row="0" Grid.ColumnSpan="2">
+        <Menu Grid.Row="0" Grid.ColumnSpan="3">
             <MenuItem Header="_File">
                 <MenuItem Header="_Open" />
                 <MenuItem Header="_Save" />
@@ -35,15 +45,31 @@
             </MenuItem>
         </Menu>
 
-        <StackPanel Grid.Row="1" Grid.Column="0">
-            <TextBlock Text="Additional Content" />
-        </StackPanel>
+        <Grid Grid.Row="1" Grid.Column="0">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
 
-        <Grid Name="DropGrid" AllowDrop="True" Drop="DropGrid_Drop" Grid.Row="1" Grid.Column="1">
-            <local:SkiaImageViewer x:Name="skiaImageViewer" />
+            <TextBlock Grid.Row="0" Text="Additional Content" />
+            <GridSplitter Grid.Row="1" Height="5" HorizontalAlignment="Stretch" VerticalAlignment="Center" Background="Gray" />
+            <local:SkiaImageViewer Grid.Row="2" x:Name="skiaImageViewer" />
         </Grid>
 
-        <StatusBar Grid.Row="2" Grid.ColumnSpan="2">
+        <GridSplitter Grid.Row="1" Grid.Column="1" Width="5" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="Gray" />
+
+        <Grid Name="DropGrid" AllowDrop="True" Drop="DropGrid_Drop" Grid.Row="1" Grid.Column="2">
+            <ListBox Name="ListBox" ItemsSource="{Binding Files}" ItemTemplate="{StaticResource FileTemplate}" SelectionChanged="ListBox_SelectionChanged">
+                <ListBox.ItemsPanel>
+                    <ItemsPanelTemplate>
+                        <WrapPanel />
+                    </ItemsPanelTemplate>
+                </ListBox.ItemsPanel>
+            </ListBox>
+        </Grid>
+
+        <StatusBar Grid.Row="2" Grid.ColumnSpan="3">
             <StatusBarItem>
                 <TextBlock x:Name="StatusTextBlock" Text="Ready" />
             </StatusBarItem>
