@@ -12,6 +12,7 @@ namespace Fileshard.Frontend.Components
     {
         private string name;
         private string path;
+        private Guid objectGuid;
         private BitmapImage icon;
 
         public string Name
@@ -23,6 +24,19 @@ namespace Fileshard.Frontend.Components
                 {
                     name = value;
                     OnPropertyChanged(nameof(Name));
+                }
+            }
+        }
+
+        public Guid ObjectGuid
+        {
+            get => objectGuid;
+            set
+            {
+                if (objectGuid != value)
+                {
+                    objectGuid = value;
+                    OnPropertyChanged(nameof(ObjectGuid));
                 }
             }
         }

@@ -12,6 +12,8 @@ namespace Fileshard.Service.Repository
 
         Task<List<FileshardObject>> GetObjects(Guid collectionId);
 
+        Task<FileshardObject?> GetObject(Guid collectionId, Guid objectId);
+
         Task<bool> IsEmpty();
     }
 }

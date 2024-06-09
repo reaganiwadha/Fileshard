@@ -1,6 +1,5 @@
 ﻿using System.Collections.ObjectModel;
 using System.IO;
-using System.Reactive.Concurrency;
 using System.Reactive.Linq;
 using Fileshard.Frontend.Components;
 using Fileshard.Service.Database;
@@ -14,17 +13,19 @@ namespace Fileshard.Frontend
     {
         private string _statusText = "";
         private string _statusCollectionText = "";
+        private string _objectDetailText = "";
+
         private FileshardCollection? _selectedCollection;
         private readonly ICollectionRepository _collectionRepository;
 
         public ObservableCollection<FileItem> Files { get; set; }
 
+        private FileshardObject? _selectedObject;
+
         public MainWindowViewModel()
         {
             _collectionRepository = new CollectionRepository();
-            Files = new ObservableCollection<FileItem>
-            {
-            };
+            Files = new ObservableCollection<FileItem> { };
 
             Observable.FromAsync(() => _collectionRepository.GetAll())
                 .ObserveOn(RxApp.MainThreadScheduler)
@@ -61,7 +62,7 @@ namespace Fileshard.Frontend
                         {
                             if (item.Files.Count == 0) continue;
 
-                            Files.Add(new FileItem { Name = item.Name, Path = item.Files.First().InternalPath, Icon = null });
+                            Files.Add(new FileItem { Name = item.Name, Path = item.Files.First().InternalPath, Icon = null, ObjectGuid = item.Id });
                         }
                     });
                 });
@@ -124,16 +125,34 @@ namespace Fileshard.Frontend
                 });
         }
 
+        internal void OnObjectSelected(Guid objectGuid)
+        {
+            SelectedObject = _collectionRepository.GetObject(_selectedCollection.Id, objectGuid).Result;
+            ObjectDetailText = $"Selected Object: {_selectedObject.Name} ({_selectedObject.Id})";
+        }
+
         public FileshardCollection? SelectedCollection
         {
             get => _selectedCollection;
             set => this.RaiseAndSetIfChanged(ref _selectedCollection, value);
         }
 
+        public FileshardObject? SelectedObject
+        {
+            get => _selectedObject;
+            set => this.RaiseAndSetIfChanged(ref _selectedObject, value);
+        }
+
         public string StatusText
         {
             get => _statusText;
             set => this.RaiseAndSetIfChanged(ref _statusText, value);
+        }
+
+        public string ObjectDetailText
+        {
+            get => _objectDetailText;
+            set => this.RaiseAndSetIfChanged(ref _objectDetailText, value);
         }
 
         public string StatusCollectionText

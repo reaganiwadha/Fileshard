@@ -1,5 +1,4 @@
 ﻿using SkiaSharp;
-using System.IO;
 using System.Windows;
 using System.Windows.Controls;
 using Fileshard.Frontend.Components;
@@ -43,6 +42,7 @@ namespace Fileshard
             if (ListBox.SelectedItem != null)
             {
                 FileItem selectedFile = (FileItem)ListBox.SelectedItem;
+                _viewModel.OnObjectSelected(selectedFile.ObjectGuid);
                 LoadFile(selectedFile.Path);
             }
         }
@@ -53,10 +53,6 @@ namespace Fileshard
             if (dialog.ShowDialog() != true) return;
 
             _viewModel.CreateAndSelectCollection(dialog.ResponseText);
-
-            /*var selected = await collectionRepository.Create(dialog.ResponseText);*/
-            /*this.selectedCollection = selected;*/
-            /*this.StatusTextBlock.Text = $"Created new collection: {dialog.ResponseText}";*/
         }
     }
 }

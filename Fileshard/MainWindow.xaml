@@ -46,7 +46,34 @@
                 <RowDefinition Height="*" />
             </Grid.RowDefinitions>
 
-            <TextBlock Grid.Row="0" Text="Additional Content" />
+            <Grid Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="70" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <!-- Row Headers -->
+                <StackPanel Grid.Column="0" Orientation="Vertical">
+                    <TextBlock Text="Name" Margin="5"/>
+                    <TextBlock Text="Id" Margin="5"/>
+                    <TextBlock Text="Collection Id" Margin="5"/>
+                </StackPanel>
+
+                <!-- Grid Content -->
+                <Grid Grid.Column="1">
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+
+                    <!-- Bind to the properties of FileshardObject -->
+                    <TextBlock Grid.Row="0" Text="{Binding SelectedObject.Name}" TextWrapping="Wrap" Margin="5"/>
+                    <TextBlock Grid.Row="1" Text="{Binding SelectedObject.Id}" Margin="5"/>
+                    <TextBlock Grid.Row="2" Text="{Binding SelectedObject.CollectionId}" Margin="5"/>
+                </Grid>
+            </Grid>
+
             <GridSplitter Grid.Row="1" Height="5" HorizontalAlignment="Stretch" VerticalAlignment="Center"  Background="Gray" />
             <local:SkiaImageViewer Grid.Row="2" x:Name="skiaImageViewer" />
         </Grid>

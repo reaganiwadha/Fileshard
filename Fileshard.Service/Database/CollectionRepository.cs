@@ -30,6 +30,14 @@ namespace Fileshard.Service.Database
             return Task.FromResult(_dbContext.Collections.ToList());
         }
 
+        public Task<FileshardObject?> GetObject(Guid collectionId, Guid objectId)
+        {
+            return Task.FromResult(_dbContext.Objects
+                        .Where(o => o.CollectionId == collectionId)
+                        .Include(o => o.Files)
+                        .FirstOrDefault(o => o.Id == objectId));
+        }
+
         public Task<List<FileshardObject>> GetObjects(Guid collectionId)
         {
             return Task.FromResult(_dbContext.Objects
