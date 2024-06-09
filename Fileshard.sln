@@ -5,9 +5,7 @@ VisualStudioVersion = 17.9.34728.123
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fileshard.Frontend", "Fileshard\Fileshard.Frontend.csproj", "{CCCE6AF2-FBED-4959-BE9A-63EF7CEA22A4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fileshard.Service", "Fileshard.Service\Fileshard.Service.csproj", "{4A734FA5-0D1D-4605-A7BC-66706687A2B0}"
-EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fileshard.Shared", "Fileshard.IPC\Fileshard.Shared.csproj", "{5645999E-55F2-4E02-84DF-EFBC7D92E8B9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fileshard.Service", "Fileshard.Service\Fileshard.Service.csproj", "{4A734FA5-0D1D-4605-A7BC-66706687A2B0}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -23,10 +21,6 @@ Global
 		{4A734FA5-0D1D-4605-A7BC-66706687A2B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4A734FA5-0D1D-4605-A7BC-66706687A2B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4A734FA5-0D1D-4605-A7BC-66706687A2B0}.Release|Any CPU.Build.0 = Release|Any CPU
-		{5645999E-55F2-4E02-84DF-EFBC7D92E8B9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{5645999E-55F2-4E02-84DF-EFBC7D92E8B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{5645999E-55F2-4E02-84DF-EFBC7D92E8B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{5645999E-55F2-4E02-84DF-EFBC7D92E8B9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

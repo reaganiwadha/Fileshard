@@ -2,15 +2,10 @@
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
-using System.Windows.Media.Imaging;
-using ServiceWire.NamedPipes;
-using Fileshard.Shared.IPC;
-using Fileshard.Shared.Structs;
 using System.Collections.ObjectModel;
 using Fileshard.Frontend.Components;
-using System.Windows.Controls.Primitives;
-using Fileshard.Frontend;
-using Wpf.Ui.Appearance;
+using Fileshard.Service.Repository;
+using Fileshard.Service.Database;
 
 namespace Fileshard
 {
@@ -19,38 +14,32 @@ namespace Fileshard
     /// </summary>
     public partial class MainWindow : Window
     {
-        private List<Database> _databases;
-
         public ObservableCollection<FileItem> Files { get; set; }
         public int RowCount { get; set; }
         public int ColumnCount { get; set; }
 
+        private readonly ICollectionRepository collectionRepository = new CollectionRepository();
+
         public MainWindow()
         {
             InitializeComponent();
-            InitConnection();
+
+            collectionRepository.IsEmpty().ContinueWith(task =>
+            {
+                if (task.Result)
+                {
+                    Dispatcher.Invoke(() =>
+                    {
+                       this.StatusTextBlock.Text = "No collections found... Please setup";
+                    });
+                }
+            });
 
             Files = new ObservableCollection<FileItem>
             {
             };
 
             DataContext = this;
-        }
-
-        private void InitConnection()
-        {
-            try
-            {
-                using (var client = new NpClient<DatabaseIPC>(new NpEndPoint("fileshard")))
-                {
-                    _databases = client.Proxy.GetDatabases();
-                    _databases.ForEach(db => this.StatusTextBlock.Text += $"{db.Guid}\n");
-                }
-            }
-            catch (Exception e)
-            {
-                this.StatusTextBlock.Text = "Cannot connect to Fileshard Service";
-            }
         }
 
         private void DropGrid_Drop(object sender, DragEventArgs e)
