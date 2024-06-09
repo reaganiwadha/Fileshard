@@ -31,6 +31,14 @@ namespace Fileshard.Service.Database
             return Task.FromResult(_dbContext.Collections.ToList());
         }
 
+        public Task UpdateFile(FileshardFile file)
+        {
+            var existing = _dbContext.Files.FindAsync(file.Id).Result;
+            _dbContext.Entry(existing).CurrentValues.SetValues(file);
+            
+            return _dbContext.SaveChangesAsync();
+        }
+
         public Task<FileshardObject?> GetObject(Guid collectionId, Guid objectId)
         {
             return Task.FromResult(_dbContext.Objects
@@ -52,14 +60,16 @@ namespace Fileshard.Service.Database
                 .Where(o => o.CollectionId == collectionId)
                 .Where(o => o.Files.Count != 0)
                 .Include(o => o.Files)
-                .Shuffle()
+                .ThenInclude(f => f.Metas)
+                .OrderBy(o => o.Files.First().InternalPath)
                 .ToList());
         }
 
         public Task Ingest(Guid collectionId, List<FileshardObject> fileshardObjects)
         {
             _dbContext.Objects.AddRange(
-                fileshardObjects.Select(obj => { obj.CollectionId = collectionId; return obj; })
+                fileshardObjects
+                    .Select(obj => { obj.CollectionId = collectionId; return obj; })
             );
 
             return _dbContext.SaveChangesAsync();

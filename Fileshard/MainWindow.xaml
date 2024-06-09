@@ -42,7 +42,7 @@
         </Menu>
 
         <Grid Grid.Row="1" Grid.Column="0">
-           
+            <Button Click="ProcessMetaHash_Click">Process Meta Hash</Button>
         </Grid>
 
         <GridSplitter Grid.Row="1" Grid.Column="1" Width="5" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="Gray" />
@@ -67,9 +67,7 @@
             </ListBox>
         </Grid>
 
-
         <GridSplitter Grid.Row="1" Grid.Column="3" Width="5" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="Gray" />
-
 
         <Grid Grid.Row="1" Grid.Column="4">
             <Grid.RowDefinitions>
@@ -151,10 +149,13 @@
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition Width="*" />
                     <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
                 </Grid.ColumnDefinitions>
                 <TextBlock x:Name="StatusTextBlock" Text="{Binding StatusText}" Grid.Column="0" />
                 <TextBlock x:Name="CollectionTextBlock" Text="{Binding StatusCollectionText}" Grid.Column="1" />
-            </Grid>
+
+                    <ProgressBar x:Name="ProgressBar" Value="{Binding Progress}" Grid.Column="2" Visibility="{Binding IsBusy}" />
+                </Grid>
         </StatusBarItem>
         </StatusBar>
     </Grid>

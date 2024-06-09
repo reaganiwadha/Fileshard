@@ -1,7 +1,9 @@
 ﻿using System.Collections.ObjectModel;
 using System.IO;
 using System.Reactive.Linq;
+using System.Windows;
 using Fileshard.Frontend.Components;
+using Fileshard.Frontend.Helpers;
 using Fileshard.Service.Database;
 using Fileshard.Service.Entities;
 using Fileshard.Service.Repository;
@@ -17,10 +19,15 @@ namespace Fileshard.Frontend
 
         private FileshardCollection? _selectedCollection;
         private readonly ICollectionRepository _collectionRepository;
+        private int _progress = 60;
+        private bool _isBusy = false;
 
         public ObservableCollection<FileItem> Files { get; set; }
 
         private FileshardObject? _selectedObject;
+
+        // Task Mutex to ensure only a single task is running at a time
+        private readonly SemaphoreSlim _taskMutex = new SemaphoreSlim(1, 1);
 
         public MainWindowViewModel()
         {
@@ -93,13 +100,14 @@ namespace Fileshard.Frontend
                     Id = Guid.NewGuid(),
                     Name = Path.GetFileName(file),
                     IsImport = true,
-                    ImportedAt = DateTime.Now
+                    Version = Guid.NewGuid(),
                 };
 
                 obj.Files.Add(new FileshardFile
                 {
                     Id = Guid.NewGuid(),
-                    InternalPath = file
+                    InternalPath = file,
+                    Version = Guid.NewGuid(),
                 });
 
                 fileshardObjects.Add(obj);
@@ -137,6 +145,71 @@ namespace Fileshard.Frontend
         {
             SelectedObject = _collectionRepository.GetObject(_selectedCollection.Id, objectGuid).Result;
             ObjectDetailText = $"Selected Object: {_selectedObject.Name} ({_selectedObject.Id})";
+        }
+
+        internal void DispatchMetaHasher()
+        {
+            StatusText = "Processing meta hashes...";
+            IsBusy = Visibility.Visible;
+
+            // Dispatch a sleeping thread that updates the progress bar every 100ms
+            new Thread(async () =>
+            {
+                _taskMutex.Wait();
+
+                var objects = await _collectionRepository.GetObjects(_selectedCollection.Id);
+                var filteredObjects = objects.Where(e => e.Files.Any(f => f.Metas.Count == 0));
+
+                int total = filteredObjects.Count();
+                foreach (var obj in filteredObjects)
+                {
+                    foreach (var file in obj.Files)
+                    {
+                        if (file.Metas.Count != 0) continue;
+
+                        String hash = "";
+                        try 
+                        {
+                            hash = HashUtil.ComputeMD5(file.InternalPath);
+                        } 
+                        catch
+                        {
+                            continue;
+                        }
+
+                        file.Metas.Add(new FileshardFileMeta
+                        {
+                            Id = Guid.NewGuid(),
+                            Key = "hash:md5",
+                            Value = hash,
+                        });
+
+
+                        await App.Current.Dispatcher.Invoke(async () =>
+                        {
+                            await _collectionRepository.UpdateFile(file);
+                        });
+
+                        Progress = (int)(((float)Progress / total) * 100);
+                    }
+                }
+
+                StatusText = "Meta hashes processed!";
+                IsBusy = Visibility.Hidden;
+                _taskMutex.Release();
+            }).Start();
+        }
+
+        public int Progress
+        {
+            get => _progress;
+            set => this.RaiseAndSetIfChanged(ref _progress, value);
+        }
+
+        public Visibility IsBusy
+        {
+            get => _isBusy ? Visibility.Visible : Visibility.Hidden;
+            set => this.RaiseAndSetIfChanged(ref _isBusy, value == Visibility.Visible);
         }
 
         public FileshardCollection? SelectedCollection

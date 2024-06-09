@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Fileshard.Service.Entities
 {
@@ -12,5 +13,11 @@ namespace Fileshard.Service.Entities
         public FileshardObject FileshardObject { get; set; } = null!;
 
         public String InternalPath { get; set; }
+
+        public ICollection<FileshardFileMeta> Metas { get; set; } = new List<FileshardFileMeta>();
+
+
+        [ConcurrencyCheck]
+        public Guid Version { get; set; }
     }
 }

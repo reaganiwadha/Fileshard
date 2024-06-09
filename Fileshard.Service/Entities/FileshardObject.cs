@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace Fileshard.Service.Entities
 {
@@ -15,6 +16,7 @@ namespace Fileshard.Service.Entities
 
         public Boolean IsImport { get; set; }
 
-        public DateTime ImportedAt { get; set; }
+        [ConcurrencyCheck]
+        public Guid Version { get; set; }
     }
 }

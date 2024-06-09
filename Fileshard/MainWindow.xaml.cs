@@ -54,5 +54,10 @@ namespace Fileshard
 
             _viewModel.CreateAndSelectCollection(dialog.ResponseText);
         }
+
+        private void ProcessMetaHash_Click(object sender, RoutedEventArgs e)
+        {
+            _viewModel.DispatchMetaHasher();
+        }
     }
 }

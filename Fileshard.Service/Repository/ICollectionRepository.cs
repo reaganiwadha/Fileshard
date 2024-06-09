@@ -10,6 +10,8 @@ namespace Fileshard.Service.Repository
 
         Task Ingest(Guid collectionId, List<FileshardObject> fileshardObjects);
 
+        Task UpdateFile(FileshardFile file);
+
         Task<List<FileshardObject>> GetObjects(Guid collectionId);
 
         Task<FileshardObject?> GetObject(Guid collectionId, Guid objectId);
