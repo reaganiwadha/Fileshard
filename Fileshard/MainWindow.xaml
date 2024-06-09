@@ -17,12 +17,14 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="400" MinWidth="100" />
+            <ColumnDefinition Width="200" MinWidth="100" />
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="400" MinWidth="100" />
         </Grid.ColumnDefinitions>
 
-        <Menu Grid.Row="0" Grid.ColumnSpan="3">
+        <Menu Grid.Row="0" Grid.ColumnSpan="5">
             <MenuItem Header="_File">
                 <MenuItem Header="_Create New Collection" Click="CreateNewCollection_Click" />
                 <MenuItem Header="_Save" />
@@ -40,42 +42,7 @@
         </Menu>
 
         <Grid Grid.Row="1" Grid.Column="0">
-            <Grid.RowDefinitions>
-                <RowDefinition Height="*" />
-                <RowDefinition Height="Auto" />
-                <RowDefinition Height="*" />
-            </Grid.RowDefinitions>
-
-            <Grid Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2">
-                <Grid.ColumnDefinitions>
-                    <ColumnDefinition Width="70" />
-                    <ColumnDefinition Width="*" />
-                </Grid.ColumnDefinitions>
-
-                <!-- Row Headers -->
-                <StackPanel Grid.Column="0" Orientation="Vertical">
-                    <TextBlock Text="Name" Margin="5"/>
-                    <TextBlock Text="Id" Margin="5"/>
-                    <TextBlock Text="Collection Id" Margin="5"/>
-                </StackPanel>
-
-                <!-- Grid Content -->
-                <Grid Grid.Column="1">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                    </Grid.RowDefinitions>
-
-                    <!-- Bind to the properties of FileshardObject -->
-                    <TextBlock Grid.Row="0" Text="{Binding SelectedObject.Name}" TextWrapping="Wrap" Margin="5"/>
-                    <TextBlock Grid.Row="1" Text="{Binding SelectedObject.Id}" Margin="5"/>
-                    <TextBlock Grid.Row="2" Text="{Binding SelectedObject.CollectionId}" Margin="5"/>
-                </Grid>
-            </Grid>
-
-            <GridSplitter Grid.Row="1" Height="5" HorizontalAlignment="Stretch" VerticalAlignment="Center"  Background="Gray" />
-            <local:SkiaImageViewer Grid.Row="2" x:Name="skiaImageViewer" />
+           
         </Grid>
 
         <GridSplitter Grid.Row="1" Grid.Column="1" Width="5" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="Gray" />
@@ -100,17 +67,95 @@
             </ListBox>
         </Grid>
 
-        <StatusBar Grid.Row="2" Grid.ColumnSpan="3">
-<StatusBarItem HorizontalContentAlignment="Stretch">
-    <Grid>
-        <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="*" />
-            <ColumnDefinition Width="*" />
-        </Grid.ColumnDefinitions>
-        <TextBlock x:Name="StatusTextBlock" Text="{Binding StatusText}" Grid.Column="0" />
-        <TextBlock x:Name="CollectionTextBlock" Text="{Binding StatusCollectionText}" Grid.Column="1" />
-    </Grid>
-</StatusBarItem>
+
+        <GridSplitter Grid.Row="1" Grid.Column="3" Width="5" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="Gray" />
+
+
+        <Grid Grid.Row="1" Grid.Column="4">
+            <Grid.RowDefinitions>
+                <RowDefinition Height="*" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="*" />
+            </Grid.RowDefinitions>
+            <Grid>
+                <TreeView Name="myTreeViewEvent">
+                    <TreeViewItem IsSelected="True" IsExpanded="True">
+                        <TreeViewItem.Header>
+                            <TextBlock Text="General" TextWrapping="Wrap"/>
+                        </TreeViewItem.Header>
+
+                        <TreeViewItem IsExpanded="True">
+                            <TreeViewItem.Header>
+                                <TextBlock Text="Name" TextWrapping="Wrap"/>
+                            </TreeViewItem.Header>
+
+                            <TreeViewItem>
+                                <TreeViewItem.Header>
+                                    <TextBlock Text="{Binding SelectedObject.Name}" TextWrapping="Wrap"/>
+                                </TreeViewItem.Header>
+                            </TreeViewItem>
+                        </TreeViewItem>
+
+                        <TreeViewItem IsExpanded="True">
+                            <TreeViewItem.Header>
+                                <TextBlock Text="Object ID" TextWrapping="Wrap"/>
+                            </TreeViewItem.Header>
+
+                            <TreeViewItem>
+                                <TreeViewItem.Header>
+                                    <TextBlock Text="{Binding SelectedObject.Id}" TextWrapping="Wrap"/>
+                                </TreeViewItem.Header>
+                            </TreeViewItem>
+                        </TreeViewItem>
+
+                        <TreeViewItem IsExpanded="True">
+                            <TreeViewItem.Header>
+                                <TextBlock Text="Collection ID" TextWrapping="Wrap"/>
+                            </TreeViewItem.Header>
+
+                            <TreeViewItem>
+                                <TreeViewItem.Header>
+                                    <TextBlock Text="{Binding SelectedObject.CollectionId}" TextWrapping="Wrap"/>
+                                </TreeViewItem.Header>
+                            </TreeViewItem>
+                        </TreeViewItem>
+
+                        <TreeViewItem IsExpanded="True">
+                            <TreeViewItem.Header>
+                                <TextBlock Text="Files" TextWrapping="Wrap"/>
+                            </TreeViewItem.Header>
+
+                            <TreeViewItem ItemsSource="{Binding SelectedObject.Files}" IsExpanded="True">
+                                <TreeViewItem.Header>
+                                    <TextBlock Text="Entry"/>
+                                </TreeViewItem.Header>
+                                
+                                <TreeViewItem.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding InternalPath}" TextWrapping="Wrap"/>
+                                    </DataTemplate>
+                                </TreeViewItem.ItemTemplate>
+                            </TreeViewItem>
+                        </TreeViewItem>
+                    </TreeViewItem>
+                </TreeView>
+            </Grid>
+
+            <GridSplitter Grid.Row="1" Height="5" HorizontalAlignment="Stretch" VerticalAlignment="Center"  Background="Gray" />
+            <local:SkiaImageViewer Grid.Row="2" x:Name="skiaImageViewer" />
+        </Grid>
+
+        <StatusBar Grid.Row="2" Grid.ColumnSpan="5">
+        <StatusBarItem HorizontalContentAlignment="Stretch">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <TextBlock x:Name="StatusTextBlock" Text="{Binding StatusText}" Grid.Column="0" />
+                <TextBlock x:Name="CollectionTextBlock" Text="{Binding StatusCollectionText}" Grid.Column="1" />
+            </Grid>
+        </StatusBarItem>
         </StatusBar>
     </Grid>
 </Window>

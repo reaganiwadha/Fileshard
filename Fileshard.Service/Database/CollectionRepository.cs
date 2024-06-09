@@ -1,6 +1,7 @@
 ﻿using Fileshard.Service.Entities;
 using Fileshard.Service.Repository;
 using Microsoft.EntityFrameworkCore;
+using MoreLinq;
 
 namespace Fileshard.Service.Database
 {
@@ -38,12 +39,20 @@ namespace Fileshard.Service.Database
                         .FirstOrDefault(o => o.Id == objectId));
         }
 
+        public Task<List<String>> FilterNonExistentFiles(List<String> files)
+        {
+               return Task.FromResult(files
+                            .Where(f => !_dbContext.Files.Any(file => file.InternalPath == f))
+                            .ToList());
+        }
+
         public Task<List<FileshardObject>> GetObjects(Guid collectionId)
         {
             return Task.FromResult(_dbContext.Objects
                 .Where(o => o.CollectionId == collectionId)
                 .Where(o => o.Files.Count != 0)
                 .Include(o => o.Files)
+                .Shuffle()
                 .ToList());
         }
 

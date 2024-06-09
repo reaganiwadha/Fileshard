@@ -78,6 +78,8 @@ namespace Fileshard.Frontend
 
             List<FileshardObject> fileshardObjects = new List<FileshardObject>();
 
+            files = _collectionRepository.FilterNonExistentFiles(files).Result;
+
             foreach (string file in files)
             {
                 string extension = Path.GetExtension(file).ToLower();
@@ -103,6 +105,12 @@ namespace Fileshard.Frontend
                 fileshardObjects.Add(obj);
 
                 StatusText = $"Loading {fileshardObjects.Count}/{files.Count} objects";
+            }
+
+            if (fileshardObjects.Count == 0)
+            {
+                StatusText = "No valid files found in the drop";
+                return;
             }
 
             Observable.FromAsync(() => _collectionRepository.Ingest(_selectedCollection.Id, fileshardObjects))

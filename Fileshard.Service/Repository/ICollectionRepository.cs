@@ -14,6 +14,8 @@ namespace Fileshard.Service.Repository
 
         Task<FileshardObject?> GetObject(Guid collectionId, Guid objectId);
 
+        Task<List<String>> FilterNonExistentFiles(List<String> files);
+
         Task<bool> IsEmpty();
     }
 }
