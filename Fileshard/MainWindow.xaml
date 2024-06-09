@@ -13,7 +13,7 @@
             <RowDefinition Height="Auto" />
         </Grid.RowDefinitions>
         <Grid.ColumnDefinitions>
-            <ColumnDefinition Width="200" MinWidth="100" />
+            <ColumnDefinition Width="400" MinWidth="100" />
             <ColumnDefinition Width="Auto" />
             <ColumnDefinition Width="*" />
         </Grid.ColumnDefinitions>
@@ -39,7 +39,7 @@
             <Grid.RowDefinitions>
                 <RowDefinition Height="*" />
                 <RowDefinition Height="Auto" />
-                <RowDefinition Height="*" />
+                <RowDefinition Height="250" />
             </Grid.RowDefinitions>
 
             <TextBlock Grid.Row="0" Text="Additional Content" />
@@ -50,13 +50,15 @@
         <GridSplitter Grid.Row="1" Grid.Column="1" Width="5" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="Gray" />
 
         <Grid Name="DropGrid" AllowDrop="True" Drop="DropGrid_Drop" Grid.Row="1" Grid.Column="2">
-            <ListBox Name="ListBox" ItemsSource="{Binding Files}" SelectionChanged="ListBox_SelectionChanged" HorizontalContentAlignment="Stretch">
+            <ListBox Name="ListBox" ItemsSource="{Binding Files}" SelectionChanged="ListBox_SelectionChanged" HorizontalContentAlignment="Stretch" VerticalContentAlignment="Top"
+                     VerticalAlignment="Stretch">
                 <ListBox.Resources>
                     <Local:DimentionConverter x:Key="Converter" />
                 </ListBox.Resources>
                 <ListBox.ItemsPanel>
                     <ItemsPanelTemplate>
-                        <UniformGrid Rows="0" Columns="{Binding RelativeSource={RelativeSource AncestorType=ListBox},Path=ActualWidth,Converter={StaticResource ResourceKey=Converter},ConverterParameter=120}" />
+                        <UniformGrid Rows="0" VerticalAlignment="Top"
+                                     Columns="{Binding RelativeSource={RelativeSource AncestorType=ListBox},Path=ActualWidth,Converter={StaticResource ResourceKey=Converter},ConverterParameter=120}" />
                     </ItemsPanelTemplate>
                 </ListBox.ItemsPanel>
                 <ListBox.ItemTemplate>

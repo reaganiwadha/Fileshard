@@ -9,11 +9,6 @@ namespace Fileshard.Service
         {
             return new List<Database>
             {
-                new Database(Guid.NewGuid(), "Database1"),
-                new Database(Guid.NewGuid(), "Database2"),
-                new Database(Guid.NewGuid(), "Database3"),
-                new Database(Guid.NewGuid(), "Database4"),
-                new Database(Guid.NewGuid(), "Database5"),
             };
         }
     }

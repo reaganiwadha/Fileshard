@@ -9,6 +9,8 @@ using Fileshard.Shared.Structs;
 using System.Collections.ObjectModel;
 using Fileshard.Frontend.Components;
 using System.Windows.Controls.Primitives;
+using Fileshard.Frontend;
+using Wpf.Ui.Appearance;
 
 namespace Fileshard
 {
@@ -26,7 +28,17 @@ namespace Fileshard
         public MainWindow()
         {
             InitializeComponent();
+            InitConnection();
 
+            Files = new ObservableCollection<FileItem>
+            {
+            };
+
+            DataContext = this;
+        }
+
+        private void InitConnection()
+        {
             try
             {
                 using (var client = new NpClient<DatabaseIPC>(new NpEndPoint("fileshard")))
@@ -37,14 +49,8 @@ namespace Fileshard
             }
             catch (Exception e)
             {
-                this.StatusTextBlock.Text = e.Message;
+                this.StatusTextBlock.Text = "Cannot connect to Fileshard Service";
             }
-
-            Files = new ObservableCollection<FileItem>
-            {
-            };
-
-            DataContext = this;
         }
 
         private void DropGrid_Drop(object sender, DragEventArgs e)
