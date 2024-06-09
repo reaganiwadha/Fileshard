@@ -5,12 +5,33 @@ namespace Fileshard.Service.Database
 {
     public class FileshardDbContext : DbContext
     {
-        public DbSet<Collection> Collections => Set<Collection>();
+        public DbSet<FileshardCollection> Collections => Set<FileshardCollection>();
+
+        public DbSet<FileshardObject> Objects => Set<FileshardObject>();
+
+        public DbSet<FileshardFile> Files => Set<FileshardFile>();
 
         public FileshardDbContext()
         {
             // Bad practice but ok for now
             Database.EnsureCreated();
+        }
+
+        protected override void OnModelCreating(ModelBuilder modelBuilder)
+        {
+            /*base.OnModelCreating(modelBuilder);*/
+
+            modelBuilder.Entity<FileshardCollection>().ToTable("collections");
+
+            modelBuilder.Entity<FileshardObject>()
+                .HasMany(o => o.Files)
+                .WithOne(f => f.FileshardObject)
+                .HasForeignKey(f => f.ObjectId);
+
+            modelBuilder.Entity<FileshardFile>()
+                .HasOne(f => f.FileshardObject)
+                .WithMany(o => o.Files)
+                .HasForeignKey(f => f.ObjectId);
         }
 
         protected override void OnConfiguring(

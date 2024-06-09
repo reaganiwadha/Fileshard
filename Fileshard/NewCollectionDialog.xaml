@@ -1,0 +1,11 @@
+﻿<Window x:Class="Fileshard.Frontend.NewCollectionDialog"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="InputDialog" Height="150" Width="300">
+    <StackPanel>
+        <Label Name="lblQuestion" Margin="10" Content="Collection Name"/>
+        <TextBox Name="txtResponse" Margin="10" PreviewTextInput="TxtResponse_PreviewTextInput" 
+                 DataObject.Pasting="TxtResponse_Pasting"/>
+        <Button Content="OK" Width="50" Margin="10" HorizontalAlignment="Right" Click="btnDialogOk_Click"/>
+    </StackPanel>
+</Window>

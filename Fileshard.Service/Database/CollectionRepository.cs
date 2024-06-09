@@ -1,9 +1,6 @@
-﻿using Fileshard.Service.Repository;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using Fileshard.Service.Entities;
+using Fileshard.Service.Repository;
+using Microsoft.EntityFrameworkCore;
 
 namespace Fileshard.Service.Database
 {
@@ -13,6 +10,42 @@ namespace Fileshard.Service.Database
 
         public CollectionRepository()
         {
+        }
+
+        public Task<Guid> Create(string title)
+        {
+            var collection = new FileshardCollection
+            {
+                Title = title
+            };
+
+            _dbContext.Collections.Add(collection);
+            _dbContext.SaveChanges();
+
+            return Task.FromResult(collection.Id);
+        }
+
+        public Task<List<FileshardCollection>> GetAll()
+        {
+            return Task.FromResult(_dbContext.Collections.ToList());
+        }
+
+        public Task<List<FileshardObject>> GetObjects(Guid collectionId)
+        {
+            return Task.FromResult(_dbContext.Objects
+                .Where(o => o.CollectionId == collectionId)
+                .Where(o => o.Files.Count != 0)
+                .Include(o => o.Files)
+                .ToList());
+        }
+
+        public Task Ingest(Guid collectionId, List<FileshardObject> fileshardObjects)
+        {
+            _dbContext.Objects.AddRange(
+                fileshardObjects.Select(obj => { obj.CollectionId = collectionId; return obj; })
+            );
+
+            return _dbContext.SaveChangesAsync();
         }
 
         public Task<bool> IsEmpty()

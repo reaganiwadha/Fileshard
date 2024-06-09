@@ -1,0 +1,20 @@
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
+namespace Fileshard.Service.Entities
+{
+    [Table("objects")]
+    public class FileshardObject
+    {
+        public Guid Id { get; set; }
+
+        public Guid CollectionId { get; set; }
+
+        public String Name { get; set; }
+
+        public ICollection<FileshardFile> Files { get; set; } = new List<FileshardFile>();
+
+        public Boolean IsImport { get; set; }
+
+        public DateTime ImportedAt { get; set; }
+    }
+}

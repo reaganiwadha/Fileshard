@@ -2,10 +2,8 @@
 using System.IO;
 using System.Windows;
 using System.Windows.Controls;
-using System.Collections.ObjectModel;
 using Fileshard.Frontend.Components;
-using Fileshard.Service.Repository;
-using Fileshard.Service.Database;
+using Fileshard.Frontend;
 
 namespace Fileshard
 {
@@ -14,32 +12,14 @@ namespace Fileshard
     /// </summary>
     public partial class MainWindow : Window
     {
-        public ObservableCollection<FileItem> Files { get; set; }
-        public int RowCount { get; set; }
-        public int ColumnCount { get; set; }
-
-        private readonly ICollectionRepository collectionRepository = new CollectionRepository();
+        private MainWindowViewModel _viewModel;
 
         public MainWindow()
         {
             InitializeComponent();
 
-            collectionRepository.IsEmpty().ContinueWith(task =>
-            {
-                if (task.Result)
-                {
-                    Dispatcher.Invoke(() =>
-                    {
-                       this.StatusTextBlock.Text = "No collections found... Please setup";
-                    });
-                }
-            });
-
-            Files = new ObservableCollection<FileItem>
-            {
-            };
-
-            DataContext = this;
+            _viewModel = new MainWindowViewModel();
+            DataContext = _viewModel;
         }
 
         private void DropGrid_Drop(object sender, DragEventArgs e)
@@ -48,19 +28,7 @@ namespace Fileshard
             {
                 string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
 
-                foreach (string file in files)
-                {
-                    string extension = Path.GetExtension(file).ToLower();
-
-                    if (extension == ".jpg" || extension == ".png") { 
-                        Files.Add(new FileItem { Name = Path.GetFileName(file), Path = file, Icon = null });
-                        this.StatusTextBlock.Text = $"Loaded {Path.GetFileName(file)}";
-                    } 
-                    else
-                    {
-                        this.StatusTextBlock.Text = $"Unsupported file format: {Path.GetFileName(file)}";
-                    }
-                }
+              _viewModel.OnFileDropped(files.ToList());
             }
         }
 
@@ -77,6 +45,18 @@ namespace Fileshard
                 FileItem selectedFile = (FileItem)ListBox.SelectedItem;
                 LoadFile(selectedFile.Path);
             }
+        }
+
+        private async void CreateNewCollection_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new NewCollectionDialog();
+            if (dialog.ShowDialog() != true) return;
+
+            _viewModel.CreateAndSelectCollection(dialog.ResponseText);
+
+            /*var selected = await collectionRepository.Create(dialog.ResponseText);*/
+            /*this.selectedCollection = selected;*/
+            /*this.StatusTextBlock.Text = $"Created new collection: {dialog.ResponseText}";*/
         }
     }
 }
