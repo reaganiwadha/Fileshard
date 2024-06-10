@@ -1,0 +1,17 @@
+﻿@using Fileshard.Service.Structs
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+
+    <ul>
+        @foreach (FileshardObject file in Model)
+		{
+			<li>@file.Name</li>
+		}
+    </ul>
+
+    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+</div>

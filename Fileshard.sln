@@ -7,6 +7,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fileshard.Frontend", "Files
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Fileshard.Service", "Fileshard.Service\Fileshard.Service.csproj", "{4A734FA5-0D1D-4605-A7BC-66706687A2B0}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Fileshard.WebApp", "Fileshard.WebApp\Fileshard.WebApp.csproj", "{F36588ED-8802-45F1-AD48-C019E3D77074}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -21,6 +23,10 @@ Global
 		{4A734FA5-0D1D-4605-A7BC-66706687A2B0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4A734FA5-0D1D-4605-A7BC-66706687A2B0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4A734FA5-0D1D-4605-A7BC-66706687A2B0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{F36588ED-8802-45F1-AD48-C019E3D77074}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{F36588ED-8802-45F1-AD48-C019E3D77074}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{F36588ED-8802-45F1-AD48-C019E3D77074}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{F36588ED-8802-45F1-AD48-C019E3D77074}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

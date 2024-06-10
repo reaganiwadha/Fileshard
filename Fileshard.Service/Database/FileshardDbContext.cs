@@ -42,12 +42,13 @@ namespace Fileshard.Service.Database
                 .WithMany(o => o.Files)
                 .HasForeignKey(f => f.ObjectId);
         }
-
         protected override void OnConfiguring(
-          DbContextOptionsBuilder optionsBuilder)
+    DbContextOptionsBuilder optionsBuilder)
         {
-            optionsBuilder.UseSqlite(
-                "Data Source=fileshard.db")
+            string tempPath = Path.GetTempPath();
+            string dbPath = Path.Combine(tempPath, "fileshard.db");
+
+            optionsBuilder.UseSqlite($"Data Source={dbPath}")
                 .UseSqliteTimestamp();
         }
     }
