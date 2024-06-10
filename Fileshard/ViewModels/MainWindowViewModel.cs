@@ -11,7 +11,7 @@ using Fileshard.Service.Entities;
 using Fileshard.Service.Repository;
 using ReactiveUI;
 
-namespace Fileshard.Frontend
+namespace Fileshard.Frontend.ViewModels
 {
     class MainWindowViewModel : ReactiveObject
     {
