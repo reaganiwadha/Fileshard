@@ -31,10 +31,22 @@ namespace Fileshard.Service.Database
             return Task.FromResult(_dbContext.Collections.ToList());
         }
 
-        public Task InsertMeta(FileshardFileMeta meta)
+        public async Task InsertMeta(FileshardFileMeta meta)
         {
-            _dbContext.FileMetas.Add(meta);
-            return _dbContext.SaveChangesAsync();
+            var existingMeta = await _dbContext.FileMetas
+                .FirstOrDefaultAsync(m => m.Key == meta.Key && m.FileId == meta.FileId);
+
+            if (existingMeta != null)
+            {
+                existingMeta.Value = meta.Value;
+                _dbContext.FileMetas.Update(existingMeta);
+            }
+            else
+            {
+                _dbContext.FileMetas.Add(meta);
+            }
+
+            await _dbContext.SaveChangesAsync();
         }
 
         public Task UpdateFile(FileshardFile file)
@@ -60,15 +72,28 @@ namespace Fileshard.Service.Database
                             .ToList());
         }
 
-        public Task<List<FileshardObject>> GetObjects(Guid collectionId)
+        public async Task<List<FileshardObject>> GetObjects(Guid collectionId)
         {
-            return Task.FromResult(_dbContext.Objects
+            var objects = await _dbContext.Objects
                 .Where(o => o.CollectionId == collectionId)
                 .Where(o => o.Files.Count != 0)
                 .Include(o => o.Files)
                 .ThenInclude(f => f.Metas)
                 .OrderBy(o => o.Files.First().InternalPath)
-                .ToList());
+                .ToListAsync();
+
+            foreach (var obj in objects)
+            {
+                foreach (var file in obj.Files)
+                {
+                    file.Metas = file.Metas
+                        .GroupBy(m => new { m.FileId, m.Key })
+                        .Select(g => g.First())
+                        .ToList();
+                }
+            }
+
+            return objects;
         }
 
         public Task Ingest(Guid collectionId, List<FileshardObject> fileshardObjects)

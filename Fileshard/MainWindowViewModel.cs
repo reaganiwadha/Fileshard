@@ -2,6 +2,8 @@
 using System.IO;
 using System.Reactive.Linq;
 using System.Windows;
+using CoenM.ImageHash;
+using CoenM.ImageHash.HashAlgorithms;
 using Fileshard.Frontend.Components;
 using Fileshard.Frontend.Helpers;
 using Fileshard.Service.Database;
@@ -158,36 +160,62 @@ namespace Fileshard.Frontend
                 _taskMutex.Wait();
 
                 var objects = await _collectionRepository.GetObjects(_selectedCollection.Id);
-                var filteredObjects = objects.Where(e => e.Files.Any(f => f.Metas.Count == 0));
+                // var filteredObjects = objects.Where(e => e.Files.Any(f => f.Metas.Count < 2));
+                var filteredObjects = objects;
 
                 int total = filteredObjects.Count();
+                int index = 0;
                 foreach (var obj in filteredObjects)
                 {
                     foreach (var file in obj.Files)
                     {
-                        if (file.Metas.Count != 0) continue;
-
-                        String hash = "";
                         try 
                         {
-                            hash = HashUtil.ComputeMD5(file.InternalPath);
+                            String hash = HashUtil.ComputeMD5(file.InternalPath);
+
+                            var meta = new FileshardFileMeta
+                            {
+                                Id = Guid.NewGuid(),
+                                Key = "hash:md5",
+                                Value = hash,
+                                FileId = file.Id,
+                            };
+
+                            await _collectionRepository.InsertMeta(meta);
                         } 
                         catch
                         {
                             continue;
                         }
 
-                        var meta = new FileshardFileMeta
+                        try 
+                        { 
+                            var diffHash = new DifferenceHash();
+                            ulong hash = 0;
+                            using (var fileStream = File.OpenRead(file.InternalPath))
+                            {
+                                hash = diffHash.Hash(fileStream);
+                            }
+
+                            if (diffHash == null || hash == 0) continue;
+
+                            var meta = new FileshardFileMeta
+                            {
+                                Id = Guid.NewGuid(),
+                                Key = "hash:ImageHash:diff",
+                                Value = hash.ToString(),
+                                FileId = file.Id,
+                            };
+
+                            await _collectionRepository.InsertMeta(meta);
+                        } catch (Exception e)
                         {
-                            Id = Guid.NewGuid(),
-                            Key = "hash:md5",
-                            Value = hash,
-                            FileId = file.Id,
-                        };
+                            continue;
+                        }
 
-                        await _collectionRepository.InsertMeta(meta);
-
-                        Progress = (int)(((float)Progress / total) * 100);
+                        index++;
+                        Progress = (int)(((float)index / total) * 100);
+                        StatusText = $"Processing meta hashes... {index}/{total}";
                     }
                 }
 
