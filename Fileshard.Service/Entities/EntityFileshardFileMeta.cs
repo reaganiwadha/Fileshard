@@ -4,13 +4,13 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Fileshard.Service.Entities
 {
     [Table("file_metas")]
-    public class FileshardFileMeta
+    internal class EntityFileshardFileMeta
     {
         public Guid Id { get; set; }
 
         public Guid FileId { get; set; }
 
-        public FileshardFile FileshardFile { get; set; } = null!;
+        public EntityFileshardFile FileshardFile { get; set; } = null!;
 
         public String Key { get; set; }
 

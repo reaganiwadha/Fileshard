@@ -1,5 +1,7 @@
-﻿using Fileshard.Service.Entities;
+﻿using AutoMapper;
+using Fileshard.Service.Entities;
 using Fileshard.Service.Repository;
+using Fileshard.Service.Structs;
 using Microsoft.EntityFrameworkCore;
 using MoreLinq;
 
@@ -9,13 +11,24 @@ namespace Fileshard.Service.Database
     {
         private readonly FileshardDbContext _dbContext = new FileshardDbContext();
 
+        private readonly IMapper _mapper;
+
         public CollectionRepository()
         {
+            var config = new MapperConfiguration(cfg => {
+                cfg.CreateMap<EntityFileshardCollection, FileshardCollection>();
+                cfg.CreateMap<EntityFileshardObject, FileshardObject>();
+                cfg.CreateMap<EntityFileshardFile, FileshardFile>();
+                cfg.CreateMap<EntityFileshardFileMeta, FileshardFileMeta>();
+                cfg.CreateMap<FileshardObject, EntityFileshardObject>();
+                cfg.CreateMap<FileshardFile, EntityFileshardFile>();
+            });
+            _mapper = config.CreateMapper();
         }
 
         public Task<Guid> Create(string title)
         {
-            var collection = new FileshardCollection
+            var collection = new EntityFileshardCollection
             {
                 Title = title
             };
@@ -26,43 +39,53 @@ namespace Fileshard.Service.Database
             return Task.FromResult(collection.Id);
         }
 
-        public Task<List<FileshardCollection>> GetAll()
+        public async Task<List<FileshardCollection>> GetAll()
         {
-            return Task.FromResult(_dbContext.Collections.ToList());
+            var collections = _dbContext.Collections
+                .ToList();
+
+            return _mapper.Map<List<FileshardCollection>>(collections);
         }
 
-        public async Task InsertMeta(FileshardFileMeta meta)
+        public async Task UpsertMeta(String key, String value, Guid fileId)
         {
             var existingMeta = await _dbContext.FileMetas
-                .FirstOrDefaultAsync(m => m.Key == meta.Key && m.FileId == meta.FileId);
+                .FirstOrDefaultAsync(m => m.Key == key && m.FileId == fileId);
 
             if (existingMeta != null)
             {
-                existingMeta.Value = meta.Value;
+                existingMeta.Value = value;
                 _dbContext.FileMetas.Update(existingMeta);
             }
             else
             {
+                var meta = new EntityFileshardFileMeta
+                {
+                    Id = Guid.NewGuid(),
+                    Key = key,
+                    Value = value,
+                    FileId = fileId,
+                };
+
                 _dbContext.FileMetas.Add(meta);
+                await _dbContext.SaveChangesAsync();
             }
-
-            await _dbContext.SaveChangesAsync();
-        }
-
-        public Task UpdateFile(FileshardFile file)
-        {
-            var existing = _dbContext.Files.FindAsync(file.Id).Result;
-            _dbContext.Entry(existing).CurrentValues.SetValues(file);
-            
-            return _dbContext.SaveChangesAsync();
         }
 
         public Task<FileshardObject?> GetObject(Guid collectionId, Guid objectId)
         {
-            return Task.FromResult(_dbContext.Objects
-                        .Where(o => o.CollectionId == collectionId)
-                        .Include(o => o.Files)
-                        .FirstOrDefault(o => o.Id == objectId));
+            var obj = _dbContext.Objects
+                .Where(o => o.CollectionId == collectionId)
+                .Include(o => o.Files)
+                .ThenInclude(f => f.Metas)
+                .FirstOrDefault(o => o.Id == objectId);
+
+            if (obj == null)
+            {
+                return Task.FromResult<FileshardObject?>(null);
+            }
+
+            return Task.FromResult<FileshardObject?>(_mapper.Map<FileshardObject>(obj));
         }
 
         public Task<List<String>> FilterNonExistentFiles(List<String> files)
@@ -93,13 +116,15 @@ namespace Fileshard.Service.Database
                 }
             }
 
-            return objects;
+            return _mapper.Map<List<FileshardObject>>(objects);
         }
 
         public Task Ingest(Guid collectionId, List<FileshardObject> fileshardObjects)
         {
+            var entities = _mapper.Map<List<EntityFileshardObject>>(fileshardObjects);
+
             _dbContext.Objects.AddRange(
-                fileshardObjects
+                entities
                     .Select(obj => { obj.CollectionId = collectionId; return obj; })
             );
 

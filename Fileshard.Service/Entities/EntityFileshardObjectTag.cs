@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Fileshard.Service.Entities
 {
-    internal class FileshardTag
+    internal class EntityFileshardObjectTag
     {
     }
 }

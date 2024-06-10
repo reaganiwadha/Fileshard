@@ -1,10 +1,6 @@
 ﻿using System.Windows.Controls;
-using System.Windows.Media.Imaging;
 using System.ComponentModel;
 using System.Windows;
-using System.Drawing;
-using System.IO;
-using ImageMagick;
 using Fileshard.Frontend.Helpers;
 
 namespace Fileshard.Frontend.Components
@@ -14,7 +10,6 @@ namespace Fileshard.Frontend.Components
         private string name;
         private string path;
         private Guid objectGuid;
-        private BitmapImage icon;
 
         public string Name
         {
@@ -51,19 +46,6 @@ namespace Fileshard.Frontend.Components
                 {
                     path = value;
                     OnPropertyChanged(nameof(Path));
-                }
-            }
-        }
-
-        public BitmapImage Icon
-        {
-            get => icon;
-            set
-            {
-                if (icon != value)
-                {
-                    icon = value;
-                    OnPropertyChanged(nameof(Icon));
                 }
             }
         }

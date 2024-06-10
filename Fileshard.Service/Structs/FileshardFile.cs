@@ -1,9 +1,11 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
-namespace Fileshard.Service.Entities
+namespace Fileshard.Service.Structs
 {
-    [Table("files")]
     public class FileshardFile
     {
         public Guid Id { get; set; }
@@ -15,9 +17,5 @@ namespace Fileshard.Service.Entities
         public String InternalPath { get; set; }
 
         public ICollection<FileshardFileMeta> Metas { get; set; } = new List<FileshardFileMeta>();
-
-
-        [ConcurrencyCheck]
-        public Guid Version { get; set; }
     }
 }

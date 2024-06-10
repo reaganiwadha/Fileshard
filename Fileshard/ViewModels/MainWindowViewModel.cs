@@ -7,8 +7,8 @@ using CoenM.ImageHash.HashAlgorithms;
 using Fileshard.Frontend.Components;
 using Fileshard.Frontend.Helpers;
 using Fileshard.Service.Database;
-using Fileshard.Service.Entities;
 using Fileshard.Service.Repository;
+using Fileshard.Service.Structs;
 using ReactiveUI;
 
 namespace Fileshard.Frontend.ViewModels
@@ -71,7 +71,7 @@ namespace Fileshard.Frontend.ViewModels
                         {
                             if (item.Files.Count == 0) continue;
 
-                            Files.Add(new FileItem { Name = item.Name, Path = item.Files.First().InternalPath, Icon = null, ObjectGuid = item.Id });
+                            Files.Add(new FileItem { Name = item.Name, Path = item.Files.First().InternalPath, ObjectGuid = item.Id });
                         }
                     });
                 });
@@ -100,16 +100,13 @@ namespace Fileshard.Frontend.ViewModels
                 var obj = new FileshardObject
                 {
                     Id = Guid.NewGuid(),
-                    Name = Path.GetFileName(file),
-                    IsImport = true,
-                    Version = Guid.NewGuid(),
+                    Name = Path.GetFileName(file)
                 };
 
                 obj.Files.Add(new FileshardFile
                 {
                     Id = Guid.NewGuid(),
-                    InternalPath = file,
-                    Version = Guid.NewGuid(),
+                    InternalPath = file
                 });
 
                 fileshardObjects.Add(obj);
@@ -172,16 +169,7 @@ namespace Fileshard.Frontend.ViewModels
                         try 
                         {
                             String hash = HashUtil.ComputeMD5(file.InternalPath);
-
-                            var meta = new FileshardFileMeta
-                            {
-                                Id = Guid.NewGuid(),
-                                Key = "hash:md5",
-                                Value = hash,
-                                FileId = file.Id,
-                            };
-
-                            await _collectionRepository.InsertMeta(meta);
+                            await _collectionRepository.UpsertMeta("hash:md5", hash, file.Id);
                         } 
                         catch
                         {
@@ -199,15 +187,7 @@ namespace Fileshard.Frontend.ViewModels
 
                             if (diffHash == null || hash == 0) continue;
 
-                            var meta = new FileshardFileMeta
-                            {
-                                Id = Guid.NewGuid(),
-                                Key = "hash:ImageHash:diff",
-                                Value = hash.ToString(),
-                                FileId = file.Id,
-                            };
-
-                            await _collectionRepository.InsertMeta(meta);
+                            await _collectionRepository.UpsertMeta("hash:ImageHash:diff", hash.ToString(), file.Id);
                         } catch (Exception e)
                         {
                             continue;

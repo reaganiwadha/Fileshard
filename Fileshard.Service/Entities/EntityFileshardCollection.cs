@@ -4,13 +4,13 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Fileshard.Service.Entities
 {
     [Table("collections")]
-    public class FileshardCollection
+    internal class EntityFileshardCollection
     {
         public Guid Id { get; set; }
 
         [Required]
         public string Title { get; set; }
 
-        public ICollection<FileshardObject> Objects { get; set; } = new List<FileshardObject>();
+        public ICollection<EntityFileshardObject> Objects { get; set; } = new List<EntityFileshardObject>();
     }
 }

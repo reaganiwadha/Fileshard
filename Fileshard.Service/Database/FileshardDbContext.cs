@@ -4,15 +4,15 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Fileshard.Service.Database
 {
-    public class FileshardDbContext : DbContext
+    internal class FileshardDbContext : DbContext
     {
-        public DbSet<FileshardCollection> Collections => Set<FileshardCollection>();
+        public DbSet<EntityFileshardCollection> Collections => Set<EntityFileshardCollection>();
 
-        public DbSet<FileshardObject> Objects => Set<FileshardObject>();
+        public DbSet<EntityFileshardObject> Objects => Set<EntityFileshardObject>();
 
-        public DbSet<FileshardFile> Files => Set<FileshardFile>();
+        public DbSet<EntityFileshardFile> Files => Set<EntityFileshardFile>();
 
-        public DbSet<FileshardFileMeta> FileMetas => Set<FileshardFileMeta>();
+        public DbSet<EntityFileshardFileMeta> FileMetas => Set<EntityFileshardFileMeta>();
 
         public FileshardDbContext()
         {
@@ -25,19 +25,19 @@ namespace Fileshard.Service.Database
         {
             /*base.OnModelCreating(modelBuilder);*/
 
-            modelBuilder.Entity<FileshardCollection>().ToTable("collections");
+            modelBuilder.Entity<EntityFileshardCollection>().ToTable("collections");
 
-            modelBuilder.Entity<FileshardObject>()
+            modelBuilder.Entity<EntityFileshardObject>()
                 .HasMany(o => o.Files)
                 .WithOne(f => f.FileshardObject)
                 .HasForeignKey(f => f.ObjectId);
 
-            modelBuilder.Entity<FileshardFile>()
+            modelBuilder.Entity<EntityFileshardFile>()
                 .HasMany(f => f.Metas)
                 .WithOne(m => m.FileshardFile)
                 .HasForeignKey(m => m.FileId);
 
-            modelBuilder.Entity<FileshardFile>()
+            modelBuilder.Entity<EntityFileshardFile>()
                 .HasOne(f => f.FileshardObject)
                 .WithMany(o => o.Files)
                 .HasForeignKey(f => f.ObjectId);

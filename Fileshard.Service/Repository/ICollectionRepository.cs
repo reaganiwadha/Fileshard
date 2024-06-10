@@ -1,4 +1,5 @@
 ﻿using Fileshard.Service.Entities;
+using Fileshard.Service.Structs;
 
 namespace Fileshard.Service.Repository
 {
@@ -10,9 +11,7 @@ namespace Fileshard.Service.Repository
 
         Task Ingest(Guid collectionId, List<FileshardObject> fileshardObjects);
 
-        Task UpdateFile(FileshardFile file);
-
-        Task InsertMeta(FileshardFileMeta meta);
+        Task UpsertMeta(String key, String value, Guid fileId);
 
         Task<List<FileshardObject>> GetObjects(Guid collectionId);
 
