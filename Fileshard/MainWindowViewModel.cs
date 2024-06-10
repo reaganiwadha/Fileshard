@@ -177,18 +177,15 @@ namespace Fileshard.Frontend
                             continue;
                         }
 
-                        file.Metas.Add(new FileshardFileMeta
+                        var meta = new FileshardFileMeta
                         {
                             Id = Guid.NewGuid(),
                             Key = "hash:md5",
                             Value = hash,
-                        });
+                            FileId = file.Id,
+                        };
 
-
-                        await App.Current.Dispatcher.Invoke(async () =>
-                        {
-                            await _collectionRepository.UpdateFile(file);
-                        });
+                        await _collectionRepository.InsertMeta(meta);
 
                         Progress = (int)(((float)Progress / total) * 100);
                     }
@@ -196,6 +193,7 @@ namespace Fileshard.Frontend
 
                 StatusText = "Meta hashes processed!";
                 IsBusy = Visibility.Hidden;
+                ReloadObjects();
                 _taskMutex.Release();
             }).Start();
         }

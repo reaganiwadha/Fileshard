@@ -31,6 +31,12 @@ namespace Fileshard.Service.Database
             return Task.FromResult(_dbContext.Collections.ToList());
         }
 
+        public Task InsertMeta(FileshardFileMeta meta)
+        {
+            _dbContext.FileMetas.Add(meta);
+            return _dbContext.SaveChangesAsync();
+        }
+
         public Task UpdateFile(FileshardFile file)
         {
             var existing = _dbContext.Files.FindAsync(file.Id).Result;
