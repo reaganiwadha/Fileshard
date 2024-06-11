@@ -5,7 +5,8 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Fileshard.Frontend.Components" xmlns:Local="clr-namespace:Fileshard.Frontend.Helpers" xmlns:local1="clr-namespace:Fileshard.Frontend.ViewModels"
         mc:Ignorable="d"
-        Title="I can't believe it's not WinUI" Height="450" Width="800">
+        Icon="/Assets/file.ico"
+        Title="Fileshard" Height="450" Width="800">
     <Window.DataContext>
         <local1:MainWindowViewModel />
     </Window.DataContext>

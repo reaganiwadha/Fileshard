@@ -6,6 +6,7 @@
     <Nullable>enable</Nullable>
     <ImplicitUsings>enable</ImplicitUsings>
     <UseWPF>true</UseWPF>
+    <ApplicationIcon>Assets\file.ico</ApplicationIcon>
   </PropertyGroup>
 
   <ItemGroup>
@@ -27,4 +28,7 @@
     <ProjectReference Include="..\Fileshard.Service\Fileshard.Service.csproj" />
   </ItemGroup>
 
+	<ItemGroup>
+		<Resource Include="Assets/file.ico" />
+	</ItemGroup>
 </Project>
