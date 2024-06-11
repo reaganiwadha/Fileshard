@@ -9,6 +9,13 @@
 
     <Grid ToolTip="{Binding Name}">
         <!-- skia:SKElement x:Name="skElement" IgnorePixelScaling="True" />-->
-        <Image ToolTip="{Binding Name}" Name="IconImage" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"  Width="100" Height="100"/>
+        <Image ToolTip="{Binding Name}" Name="IconImage" HorizontalAlignment="Stretch" VerticalAlignment="Stretch" Width="100" Height="100">
+            <Image.ContextMenu>
+                <ContextMenu>
+                    <MenuItem Header="Open File" Click="OpenFileMenuItem_Click"/>
+                    <MenuItem Header="Open Containing Folder" Click="OpenContainingMenuItem_Click"/>
+                </ContextMenu>
+            </Image.ContextMenu>
+        </Image>
     </Grid>
 </UserControl>

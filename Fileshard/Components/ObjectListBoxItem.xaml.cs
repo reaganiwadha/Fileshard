@@ -2,6 +2,7 @@
 using System.ComponentModel;
 using System.Windows;
 using Fileshard.Frontend.Helpers;
+using System.Diagnostics;
 
 namespace Fileshard.Frontend.Components
 {
@@ -63,6 +64,8 @@ namespace Fileshard.Frontend.Components
     /// </summary>
     public partial class ObjectListBoxItem : UserControl
     {
+        private String _path = "";
+
         public ObjectListBoxItem()
         {
             InitializeComponent();
@@ -75,6 +78,34 @@ namespace Fileshard.Frontend.Components
             {
                 fileItem.PropertyChanged += OnFileItemPropertyChanged;
                 await StartDrawingTaskAsync(fileItem.Path);
+            }
+        }
+
+        private void OpenContainingMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                Process.Start("explorer.exe", "/select," + _path);
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Failed to open containing folder: {ex.Message}");
+            }
+        }
+
+        private void OpenFileMenuItem_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                Process.Start(new ProcessStartInfo
+                {
+                    FileName = _path,
+                    UseShellExecute = true
+                });
+            }
+            catch (Exception ex)
+            {
+                MessageBox.Show($"Failed to open file: {ex.Message}");
             }
         }
 
@@ -92,6 +123,7 @@ namespace Fileshard.Frontend.Components
             {
                 var thumbnail = await Task.Run(() => ThumbnailUtil.GetThumbnailByPath(path));
                 IconImage.Source = thumbnail;
+                _path = path;
             }
             catch (Exception e)
             {
