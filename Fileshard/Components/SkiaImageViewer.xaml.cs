@@ -15,6 +15,7 @@ namespace Fileshard.Frontend.Components
 
         public void LoadBitmap(SKData sKData)
         {
+            try { 
             if (this._skBitmap != null)
             {
                 this._skBitmap.Dispose();
@@ -25,6 +26,10 @@ namespace Fileshard.Frontend.Components
 
             this._skBitmap = bitmap;
             skElement.InvalidateVisual();
+            } catch (System.Exception e)
+            {
+                System.Windows.MessageBox.Show("Error while drawing image " + e.Message);
+            }
         }
 
         private void OnPaintSurface(object sender, SKPaintSurfaceEventArgs e)

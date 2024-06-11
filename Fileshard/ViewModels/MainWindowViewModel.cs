@@ -2,6 +2,7 @@
 using System.IO;
 using System.Reactive.Linq;
 using System.Windows;
+using System.Windows.Threading;
 using CoenM.ImageHash;
 using CoenM.ImageHash.HashAlgorithms;
 using Fileshard.Frontend.Components;
@@ -9,6 +10,7 @@ using Fileshard.Frontend.Helpers;
 using Fileshard.Service.Database;
 using Fileshard.Service.Repository;
 using Fileshard.Service.Structs;
+using Microsoft.Msagl.Drawing;
 using ReactiveUI;
 
 namespace Fileshard.Frontend.ViewModels
@@ -23,6 +25,8 @@ namespace Fileshard.Frontend.ViewModels
         private readonly ICollectionRepository _collectionRepository;
         private int _progress = 60;
         private bool _isBusy = false;
+
+        private Graph _graph;
 
         public ObservableCollection<FileItem> Files { get; set; }
 
@@ -75,6 +79,53 @@ namespace Fileshard.Frontend.ViewModels
                         }
                     });
                 });
+        }
+
+        private void DispatchGraphUpdate()
+        {
+            Graph = new Graph();
+
+            new Thread(() =>
+            {
+                var graph = new Graph();
+                graph.AddNode(_selectedObject.Id.ToString());
+                graph.AddNode("name");
+                var name = _selectedObject.Name.WrapAt(2    0).JoinLines();
+
+                graph.AddNode(name);
+
+                graph.AddEdge(_selectedObject.Id.ToString(), "name");
+                graph.AddEdge("name", name);
+
+                graph.AddNode("files");
+                graph.AddEdge(_selectedObject.Id.ToString(), "files");
+
+
+                foreach (var file in _selectedObject.Files)
+                {
+                    graph.AddNode(file.Id.ToString());
+                    graph.AddEdge("files", file.Id.ToString());
+
+                    var internalPath = file.InternalPath.WrapAt(25).JoinLines();
+                    var n = graph.AddNode(internalPath);
+
+                    graph.AddEdge(file.Id.ToString(), internalPath);
+
+                    graph.AddNode("metas");
+                    graph.AddEdge(file.Id.ToString(), "metas");
+
+                    foreach (var meta in file.Metas)
+                    {
+                        graph.AddNode(meta.Key);
+                        graph.AddEdge("metas", meta.Key);
+
+                        graph.AddNode(meta.Value);
+                        graph.AddEdge(meta.Key, meta.Value);
+                    }
+                }
+
+                Graph = graph;
+            }).Start();
         }
 
         public void OnFileDropped(List<String> files)
@@ -144,6 +195,7 @@ namespace Fileshard.Frontend.ViewModels
         {
             SelectedObject = _collectionRepository.GetObject(_selectedCollection.Id, objectGuid).Result;
             ObjectDetailText = $"Selected Object: {_selectedObject.Name} ({_selectedObject.Id})";
+            DispatchGraphUpdate();
         }
 
         internal void DispatchMetaHasher()
@@ -204,6 +256,12 @@ namespace Fileshard.Frontend.ViewModels
                 ReloadObjects();
                 _taskMutex.Release();
             }).Start();
+        }
+
+        public Graph Graph
+        {
+            get => _graph;
+            set => this.RaiseAndSetIfChanged(ref _graph, value);
         }
 
         public int Progress

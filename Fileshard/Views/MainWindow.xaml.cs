@@ -4,6 +4,8 @@ using System.Windows.Controls;
 using Fileshard.Frontend.Components;
 using Fileshard.Frontend;
 using Fileshard.Frontend.ViewModels;
+using Microsoft.Msagl.Drawing;
+using System;
 
 namespace Fileshard
 {
@@ -47,6 +49,7 @@ namespace Fileshard
                 LoadFile(selectedFile.Path);
             }
         }
+
 
         private async void CreateNewCollection_Click(object sender, RoutedEventArgs e)
         {

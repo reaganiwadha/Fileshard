@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Windows;
 using Fileshard.Frontend.Helpers;
 using System.Diagnostics;
+using Fileshard.Service.Structs;
 
 namespace Fileshard.Frontend.Components
 {
