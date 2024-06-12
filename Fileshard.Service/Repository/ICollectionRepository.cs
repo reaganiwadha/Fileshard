@@ -13,6 +13,10 @@ namespace Fileshard.Service.Repository
 
         Task UpsertMeta(String key, String value, Guid fileId);
 
+        Task UpsertMeta(String key, DateTime value, Guid fileId);
+
+        Task UpsertMeta(String key, ulong value, Guid fileId);
+
         Task<List<FileshardObject>> GetObjects(Guid collectionId);
 
         Task<FileshardObject?> GetObject(Guid collectionId, Guid objectId);

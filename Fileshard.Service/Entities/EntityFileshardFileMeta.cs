@@ -14,8 +14,11 @@ namespace Fileshard.Service.Entities
 
         public String Key { get; set; }
 
-        public String Value { get; set; }
+        public String? Value { get; set; }
 
+        public DateTime? TimeValue { get; set; }
+
+        public ulong? LongValue { get; set; }
 
         [ConcurrencyCheck]
         public Guid Version { get; set; }

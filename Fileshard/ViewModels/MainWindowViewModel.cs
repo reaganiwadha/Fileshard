@@ -164,6 +164,12 @@ namespace Fileshard.Frontend.ViewModels
 
         internal void DispatchMetaHasher()
         {
+            if (_selectedCollection == null)
+            {
+                StatusText = "Please select a collection first";
+                return;
+            }
+
             var task = new FileProcessorChore(_collectionRepository, _selectedCollection.Id);
             Observable.FromAsync(() => task.GetTask())
                 .ObserveOn(RxApp.MainThreadScheduler)

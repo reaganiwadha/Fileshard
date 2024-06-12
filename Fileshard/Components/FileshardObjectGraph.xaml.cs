@@ -4,6 +4,8 @@ using System.Windows;
 using System.Xml;
 using Microsoft.Msagl.Drawing;
 using Fileshard.Frontend.Helpers;
+using Microsoft.Msagl.Layout.MDS;
+using Microsoft.Msagl.Core.Routing;
 
 namespace Fileshard.Frontend.Components { 
     public partial class FileshardObjectGraph : UserControl
@@ -36,13 +38,16 @@ namespace Fileshard.Frontend.Components {
                 DispatchGraphUpdate(newFileshardObject);
             }
         }
-
         private void DispatchGraphUpdate(FileshardObject _selectedObject)
         {
             graphName.Graph = new Graph();
             new Thread(() =>
             {
                 var graph = new Graph();
+                graph.Attr.OptimizeLabelPositions = true;
+                graph.Attr.LayerDirection = LayerDirection.TB;
+                graph.CreateLayoutSettings().EdgeRoutingSettings.EdgeRoutingMode = EdgeRoutingMode.StraightLine;
+
                 graph.AddNode(_selectedObject.Id.ToString());
                 graph.AddNode("name");
                 var name = _selectedObject.Name.WrapAt(20).JoinLines();
@@ -54,7 +59,6 @@ namespace Fileshard.Frontend.Components {
 
                 graph.AddNode("files");
                 graph.AddEdge(_selectedObject.Id.ToString(), "files");
-
 
                 foreach (var file in _selectedObject.Files)
                 {
@@ -71,17 +75,48 @@ namespace Fileshard.Frontend.Components {
 
                     foreach (var meta in file.Metas)
                     {
-                        graph.AddNode(meta.Key);
-                        graph.AddEdge("metas", meta.Key);
+                        var parts = meta.Key.Split(':');
 
-                        graph.AddNode(meta.Value);
-                        graph.AddEdge(meta.Key, meta.Value);
+                        string value = null;
+                        if (meta.TimeValue != null)
+                        {
+                            value = meta.TimeValue.ToString();
+                        }
+                        else if (meta.Value != null)
+                        {
+                            value = meta.Value;
+                        }
+                        else if (meta.LongValue != null)
+                        {
+                            value = meta.LongValue.ToString();
+                        }
+
+                        AddNodesAndEdges(graph, parts, 0, "metas", value);
                     }
                 }
 
                 // Execute on UI Thread
                 Dispatcher.Invoke(() => { graphName.Graph = graph; });
             }).Start();
+        }
+
+        void AddNodesAndEdges(Graph graph, string[] parts, int index, string parentNode, string value)
+        {
+            if (index >= parts.Length)
+            {
+                if (value != null)
+                {
+                    graph.AddNode(value);
+                    graph.AddEdge(parentNode, value);
+                }
+                return;
+            }
+
+            string currentNode = parts[index];
+            graph.AddNode(currentNode);
+            graph.AddEdge(parentNode, currentNode);
+
+            AddNodesAndEdges(graph, parts, index + 1, currentNode, value);
         }
     }
 }

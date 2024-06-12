@@ -14,7 +14,11 @@ namespace Fileshard.Service.Structs
 
         public FileshardFile FileshardFile { get; set; } = null!;
 
-        public String Key { get; set; }
+        public String? Key { get; set; }
+
+        public DateTime? TimeValue { get; set; }
+
+        public ulong? LongValue { get; set; }
 
         public String Value { get; set; }
     }

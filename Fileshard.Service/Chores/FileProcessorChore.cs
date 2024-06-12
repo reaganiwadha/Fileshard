@@ -3,6 +3,7 @@ using CoenM.ImageHash;
 using Fileshard.Frontend.Helpers;
 using Fileshard.Service.Repository;
 using Fileshard.Service.Structs;
+using ImageMagick;
 
 namespace Fileshard.Service.Chores
 {
@@ -48,14 +49,29 @@ namespace Fileshard.Service.Chores
                         continue;
                     }
 
+                    try
+                    {
+                        // Using Magick .NET to read image dimensions
+                        using (var image = new MagickImage(file.InternalPath))
+                        {
+                            await _collectionRepository.UpsertMeta("image:width", (ulong) image.Width, file.Id);
+                            await _collectionRepository.UpsertMeta("image:height", (ulong) image.Height, file.Id);
+
+                            await _collectionRepository.UpsertMeta("image:format", image.Format.ToString(), file.Id);
+                        }
+                    } catch
+                    {
+                        continue;
+                    }
+
                     // Read file's Date Created and Date Modified
                     try
                     {
                         var dateCreated = File.GetCreationTime(file.InternalPath);
                         var dateModified = File.GetLastWriteTime(file.InternalPath);
 
-                        await _collectionRepository.UpsertMeta("date:created", dateCreated.ToString(), file.Id);
-                        await _collectionRepository.UpsertMeta("date:modified", dateModified.ToString(), file.Id);
+                        await _collectionRepository.UpsertMeta("date:created", dateCreated, file.Id);
+                        await _collectionRepository.UpsertMeta("date:modified", dateModified, file.Id);
                     }
                     catch
                     {
@@ -73,7 +89,7 @@ namespace Fileshard.Service.Chores
 
                         if (diffHash == null || hash == 0) continue;
 
-                        await _collectionRepository.UpsertMeta("hash:ImageHash:diff", hash.ToString(), file.Id);
+                        await _collectionRepository.UpsertMeta("hash:ImageHash:diff", hash, file.Id);
                     }
                     catch (Exception e)
                     {
