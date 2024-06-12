@@ -72,6 +72,16 @@ namespace Fileshard.Service.Database
             }
         }
 
+        public Task<Boolean> FileHasMeta(String key, Guid fileId)
+        { 
+            return Task.FromResult(_dbContext.FileMetas.Any(m => m.Key == key && m.FileId == fileId));
+        }
+
+        public Task<Boolean> FileHasMetas(Guid fileId, params string[] keys)
+        {
+            return Task.FromResult(keys.All(key => _dbContext.FileMetas.Any(m => m.Key == key && m.FileId == fileId)));
+        }
+
         public Task<FileshardObject?> GetObject(Guid collectionId, Guid objectId)
         {
             var obj = _dbContext.Objects
@@ -102,7 +112,7 @@ namespace Fileshard.Service.Database
                 .Where(o => o.Files.Count != 0)
                 .Include(o => o.Files)
                 .ThenInclude(f => f.Metas)
-                .OrderBy(o => o.Files.First().InternalPath)
+                /*.OrderBy(o => o.Files.First().InternalPath)*/
                 .ToListAsync();
 
             foreach (var obj in objects)
@@ -116,7 +126,7 @@ namespace Fileshard.Service.Database
                 }
             }
 
-            return _mapper.Map<List<FileshardObject>>(objects);
+            return _mapper.Map<List<FileshardObject>>(objects.Shuffle());
         }
 
         public Task Ingest(Guid collectionId, List<FileshardObject> fileshardObjects)

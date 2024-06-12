@@ -35,11 +35,8 @@ namespace Fileshard.Service.Chores
             get => _progress;
             private set
             {
-                if (_progress != value)
-                {
-                    _progress = value;
-                    OnPropertyChanged();
-                }
+                _progress = value;
+                OnPropertyChanged();
             }
         }
 
@@ -94,6 +91,7 @@ namespace Fileshard.Service.Chores
             int processedItems = 0;
 
             List<Task> tasks = new List<Task>();
+            object progressLock = new object(); // Lock object for progress update
 
             if (AsyncCollection != null)
             {
@@ -112,8 +110,14 @@ namespace Fileshard.Service.Chores
                         await ProcessItemAsync(item, token);
                         Interlocked.Increment(ref processedItems);
                         float progress = (float)processedItems / totalItems * 100;
-                        Interlocked.Exchange(ref _progress, progress);
-                        StatusText = BuildStatusText(processedItems, totalItems, progress);
+
+                        // Update progress and status text within lock
+                        lock (progressLock)
+                        {
+                            Interlocked.Exchange(ref _progress, progress);
+                            StatusText = BuildStatusText(processedItems, totalItems, progress);
+                            Progress = progress;
+                        }
                     }));
 
                     if (tasks.Count >= ThreadCount)
@@ -140,8 +144,14 @@ namespace Fileshard.Service.Chores
                         await ProcessItemAsync(item, token);
                         Interlocked.Increment(ref processedItems);
                         float progress = (float)processedItems / totalItems * 100;
-                        Interlocked.Exchange(ref _progress, progress);
-                        StatusText = BuildStatusText(processedItems, totalItems, progress);
+
+                        // Update progress and status text within lock
+                        lock (progressLock)
+                        {
+                            Interlocked.Exchange(ref _progress, progress);
+                            StatusText = BuildStatusText(processedItems, totalItems, progress);
+                            Progress = progress;
+                        }
                     }));
 
                     if (tasks.Count >= ThreadCount)
@@ -157,6 +167,7 @@ namespace Fileshard.Service.Chores
             StatusText = "Completed";
             IsActive = false;
         }
+
 
         protected abstract Task ProcessItemAsync(T item, CancellationToken token);
 

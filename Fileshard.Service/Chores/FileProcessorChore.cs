@@ -39,25 +39,28 @@ namespace Fileshard.Service.Chores
             {
                 foreach (var file in item.Files)
                 {
-                    try
-                    {
-                        String hash = HashUtil.ComputeMD5(file.InternalPath);
-                        await _collectionRepository.UpsertMeta("hash:md5", hash, file.Id);
-                    }
-                    catch
-                    {
-                        continue;
-                    }
-
-                    try
-                    {
-                        // Using Magick .NET to read image dimensions
-                        using (var image = new MagickImage(file.InternalPath))
+                    if (!_collectionRepository.FileHasMeta("hash:md5", file.Id).Result) { 
+                        try
                         {
-                            await _collectionRepository.UpsertMeta("image:width", (ulong) image.Width, file.Id);
-                            await _collectionRepository.UpsertMeta("image:height", (ulong) image.Height, file.Id);
+                            String hash = HashUtil.ComputeMD5(file.InternalPath);
+                            await _collectionRepository.UpsertMeta("hash:md5", hash, file.Id);
+                        }
+                        catch
+                        {
+                            continue;
+                        }
+                    }
+                    try
+                    {
+                        if (! await _collectionRepository.FileHasMetas(file.Id, "image:width", "image:height", "image:format")) { 
+                            // Using Magick .NET to read image dimensions
+                            using (var image = new MagickImage(file.InternalPath))
+                            {
+                                await _collectionRepository.UpsertMeta("image:width", (ulong) image.Width, file.Id);
+                                await _collectionRepository.UpsertMeta("image:height", (ulong) image.Height, file.Id);
 
-                            await _collectionRepository.UpsertMeta("image:format", image.Format.ToString(), file.Id);
+                                await _collectionRepository.UpsertMeta("image:format", image.Format.ToString(), file.Id);
+                            }
                         }
                     } catch
                     {
@@ -67,11 +70,13 @@ namespace Fileshard.Service.Chores
                     // Read file's Date Created and Date Modified
                     try
                     {
-                        var dateCreated = File.GetCreationTime(file.InternalPath);
-                        var dateModified = File.GetLastWriteTime(file.InternalPath);
+                        if (! await _collectionRepository.FileHasMetas(file.Id, "date:created", "date:modified")) { 
+                            var dateCreated = File.GetCreationTime(file.InternalPath);
+                            var dateModified = File.GetLastWriteTime(file.InternalPath);
 
-                        await _collectionRepository.UpsertMeta("date:created", dateCreated, file.Id);
-                        await _collectionRepository.UpsertMeta("date:modified", dateModified, file.Id);
+                            await _collectionRepository.UpsertMeta("date:created", dateCreated, file.Id);
+                            await _collectionRepository.UpsertMeta("date:modified", dateModified, file.Id);
+                        }
                     }
                     catch
                     {
@@ -80,16 +85,18 @@ namespace Fileshard.Service.Chores
 
                     try
                     {
-                        var diffHash = new DifferenceHash();
-                        ulong hash = 0;
-                        using (var fileStream = File.OpenRead(file.InternalPath))
-                        {
-                            hash = diffHash.Hash(fileStream);
+                        if (! await _collectionRepository.FileHasMeta("hash:ImageHash:diff", file.Id)) { 
+                            var diffHash = new DifferenceHash();
+                            ulong hash = 0;
+                            using (var fileStream = File.OpenRead(file.InternalPath))
+                            {
+                                hash = diffHash.Hash(fileStream);
+                            }
+
+                            if (diffHash == null || hash == 0) continue;
+
+                            await _collectionRepository.UpsertMeta("hash:ImageHash:diff", hash, file.Id);
                         }
-
-                        if (diffHash == null || hash == 0) continue;
-
-                        await _collectionRepository.UpsertMeta("hash:ImageHash:diff", hash, file.Id);
                     }
                     catch (Exception e)
                     {

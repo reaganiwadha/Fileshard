@@ -11,6 +11,10 @@ namespace Fileshard.Service.Repository
 
         Task Ingest(Guid collectionId, List<FileshardObject> fileshardObjects);
 
+        Task<Boolean> FileHasMeta(String key, Guid fileId);
+
+        Task<Boolean> FileHasMetas(Guid fileId, params string[] keys);
+
         Task UpsertMeta(String key, String value, Guid fileId);
 
         Task UpsertMeta(String key, DateTime value, Guid fileId);

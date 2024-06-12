@@ -15,6 +15,9 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.6" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.6" />
     <PackageReference Include="morelinq" Version="4.2.0" />
+    <PackageReference Include="MSTest.TestFramework" Version="3.4.3" />
+    <PackageReference Include="Python.Included" Version="3.11.6" />
+    <PackageReference Include="pythonnet" Version="3.0.3" />
     <PackageReference Include="ServiceWire" Version="5.5.4" />
   </ItemGroup>
 
