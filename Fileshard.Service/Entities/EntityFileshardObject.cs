@@ -14,6 +14,8 @@ namespace Fileshard.Service.Entities
 
         public ICollection<EntityFileshardFile> Files { get; set; } = new List<EntityFileshardFile>();
 
+        public EntityFileshardCollection Collection { get; set; } = null!;
+
         public Boolean IsImport { get; set; }
 
         [ConcurrencyCheck]

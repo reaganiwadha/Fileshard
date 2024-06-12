@@ -18,7 +18,7 @@ namespace Fileshard.Service.Entities
 
         public DateTime? TimeValue { get; set; }
 
-        public ulong? LongValue { get; set; }
+        public long? LongValue { get; set; }
 
         [ConcurrencyCheck]
         public Guid Version { get; set; }

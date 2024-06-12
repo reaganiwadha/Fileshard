@@ -19,7 +19,7 @@ namespace Fileshard.Service.Repository
 
         Task UpsertMeta(String key, DateTime value, Guid fileId);
 
-        Task UpsertMeta(String key, ulong value, Guid fileId);
+        Task UpsertMeta(String key, long value, Guid fileId);
 
         Task<List<FileshardObject>> GetObjects(Guid collectionId);
 

@@ -146,7 +146,7 @@ namespace Fileshard.Service.Database
             return Task.FromResult(!_dbContext.Collections.Any());
         }
 
-        public async Task UpsertMeta(string key, ulong value, Guid fileId)
+        public async Task UpsertMeta(string key, long value, Guid fileId)
         {
             var existingMeta = await _dbContext.FileMetas
                 .FirstOrDefaultAsync(m => m.Key == key && m.FileId == fileId);

@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Fileshard.Service.Structs
+﻿namespace Fileshard.Service.Structs
 {
     public class FileshardCollection
     {

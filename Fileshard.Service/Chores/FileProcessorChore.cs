@@ -47,30 +47,28 @@ namespace Fileshard.Service.Chores
                         }
                         catch
                         {
-                            continue;
                         }
                     }
                     try
                     {
-                        if (! await _collectionRepository.FileHasMetas(file.Id, "image:width", "image:height", "image:format")) { 
+                        if (!_collectionRepository.FileHasMetas(file.Id, "image:width", "image:height", "image:format").Result) { 
                             // Using Magick .NET to read image dimensions
                             using (var image = new MagickImage(file.InternalPath))
                             {
-                                await _collectionRepository.UpsertMeta("image:width", (ulong) image.Width, file.Id);
-                                await _collectionRepository.UpsertMeta("image:height", (ulong) image.Height, file.Id);
+                                await _collectionRepository.UpsertMeta("image:width", (long) image.Width, file.Id);
+                                await _collectionRepository.UpsertMeta("image:height", (long) image.Height, file.Id);
 
                                 await _collectionRepository.UpsertMeta("image:format", image.Format.ToString(), file.Id);
                             }
                         }
                     } catch
                     {
-                        continue;
                     }
 
                     // Read file's Date Created and Date Modified
                     try
                     {
-                        if (! await _collectionRepository.FileHasMetas(file.Id, "date:created", "date:modified")) { 
+                        if (!_collectionRepository.FileHasMetas(file.Id, "date:created", "date:modified").Result) { 
                             var dateCreated = File.GetCreationTime(file.InternalPath);
                             var dateModified = File.GetLastWriteTime(file.InternalPath);
 
@@ -80,12 +78,11 @@ namespace Fileshard.Service.Chores
                     }
                     catch
                     {
-                        continue;
                     }
 
                     try
                     {
-                        if (! await _collectionRepository.FileHasMeta("hash:ImageHash:diff", file.Id)) { 
+                        if (!_collectionRepository.FileHasMeta("hash:ImageHash:diff", file.Id).Result) { 
                             var diffHash = new DifferenceHash();
                             ulong hash = 0;
                             using (var fileStream = File.OpenRead(file.InternalPath))
@@ -95,12 +92,11 @@ namespace Fileshard.Service.Chores
 
                             if (diffHash == null || hash == 0) continue;
 
-                            await _collectionRepository.UpsertMeta("hash:ImageHash:diff", hash, file.Id);
+                            await _collectionRepository.UpsertMeta("hash:ImageHash:diff", (long) hash, file.Id);
                         }
                     }
                     catch (Exception e)
                     {
-                        continue;
                     }
                 }
 

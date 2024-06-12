@@ -1,6 +1,10 @@
 ﻿using Dorssel.EntityFrameworkCore;
 using Fileshard.Service.Entities;
+using Fileshard.Service.Migrations;
+using FluentMigrator.Runner;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Logging;
 
 namespace Fileshard.Service.Database
 {
@@ -16,9 +20,26 @@ namespace Fileshard.Service.Database
 
         public FileshardDbContext()
         {
+            Migrate();
+
             // Bad practice but ok for now
-            Database.EnsureCreated();
-            Database.Migrate();
+            /*Database.EnsureCreated();
+            Database.Migrate();*/
+        }
+
+        private void Migrate()
+        {
+            var serviceProvider = new ServiceCollection();
+            serviceProvider.AddFluentMigratorCore()
+                             .ConfigureRunner(rb => rb
+                                    .AddSQLite()
+                                    .WithGlobalConnectionString($"Data Source={GetDatabasePath()}")
+                                    .ScanIn(typeof(CreateFileshardCollectionTable).Assembly).For.Migrations())
+                             .AddLogging(lb => lb.AddFluentMigratorConsole());
+
+            var sp = serviceProvider.BuildServiceProvider();
+            var runner = sp.GetRequiredService<IMigrationRunner>();
+            runner.MigrateUp();
         }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -37,18 +58,28 @@ namespace Fileshard.Service.Database
                 .WithOne(m => m.FileshardFile)
                 .HasForeignKey(m => m.FileId);
 
+            modelBuilder.Entity<EntityFileshardCollection>()
+                .HasMany(c => c.Objects)
+                .WithOne(o => o.Collection)
+                .HasForeignKey(o => o.CollectionId);
+
             modelBuilder.Entity<EntityFileshardFile>()
                 .HasOne(f => f.FileshardObject)
                 .WithMany(o => o.Files)
                 .HasForeignKey(f => f.ObjectId);
         }
-        protected override void OnConfiguring(
-    DbContextOptionsBuilder optionsBuilder)
+
+        private string GetDatabasePath()
         {
             string tempPath = Path.GetTempPath();
             string dbPath = Path.Combine(tempPath, "fileshard.db");
 
-            optionsBuilder.UseSqlite($"Data Source={dbPath}")
+            return dbPath;
+        }
+
+        protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+        {
+            optionsBuilder.UseSqlite($"Data Source={GetDatabasePath()}")
                 .UseSqliteTimestamp();
         }
     }
