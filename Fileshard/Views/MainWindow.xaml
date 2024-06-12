@@ -158,8 +158,9 @@
 
             <GridSplitter Grid.Row="1" Height="5" HorizontalAlignment="Stretch" VerticalAlignment="Center"  Background="Gray" />
 
-            <wpfcoregraphcontrol:AutomaticGraphLayoutControl Grid.Row="2" Graph="{Binding Graph}" />
-            
+            <!-- <wpfcoregraphcontrol:AutomaticGraphLayoutControl Grid.Row="2" Graph="{Binding Graph}" /> -->
+            <local:FileshardObjectGraph Grid.Row="2" FileshardObject="{Binding SelectedObject}" />
+
             <GridSplitter Grid.Row="3" Height="5" HorizontalAlignment="Stretch" VerticalAlignment="Center"  Background="Gray" />
             <local:SkiaImageViewer Grid.Row="4" x:Name="skiaImageViewer" />
         </Grid>
