@@ -43,8 +43,34 @@
         </Menu>
 
         <Grid Grid.Row="1" Grid.Column="0">
-            <Button Click="ProcessMetaHash_Click">Process Meta Hash</Button>
+            <Grid>
+                <Grid.Resources>
+                    <Style TargetType="Border">
+                        <Setter Property="Padding" Value="10" />
+                    </Style>
+                    <Style TargetType="Button">
+                        <Setter Property="HorizontalAlignment" Value="Center" />
+                        <Setter Property="Margin" Value="5" />
+                    </Style>
+                    <Style TargetType="TextBox">
+                        <Setter Property="Margin" Value="5" />
+                    </Style>
+                </Grid.Resources>
+
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <Border Grid.Row="0">
+                    <Button Click="ProcessMetaHash_Click">Process File Metas</Button>
+                </Border>
+                <Border Grid.Row="1">
+                    <Button Click="ProcessObjectTags_Click">Process Object Tags</Button>
+                </Border>
+            </Grid>
         </Grid>
+
 
         <GridSplitter Grid.Row="1" Grid.Column="1" Width="5" HorizontalAlignment="Center" VerticalAlignment="Stretch" Background="Gray" />
 
@@ -159,7 +185,24 @@
             <GridSplitter Grid.Row="1" Height="5" HorizontalAlignment="Stretch" VerticalAlignment="Center"  Background="Gray" />
 
             <!-- <wpfcoregraphcontrol:AutomaticGraphLayoutControl Grid.Row="2" Graph="{Binding Graph}" /> -->
-            <local:FileshardObjectGraph Grid.Row="2" FileshardObject="{Binding SelectedObject}" />
+            <TabControl Grid.Row="2">
+                <TabItem>
+                    <TabItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Metas" Foreground="Blue" />
+                        </StackPanel>
+                    </TabItem.Header>
+                    <local:FileshardObjectGraph FileshardObject="{Binding SelectedObject}" />
+                </TabItem>
+                <TabItem>
+                    <TabItem.Header>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="Tags" Foreground="Red" />
+                        </StackPanel>
+                    </TabItem.Header>
+                    <local:FileshardObjectTagGraph Object="{Binding SelectedObject}" />
+                </TabItem>
+            </TabControl>
 
             <GridSplitter Grid.Row="3" Height="5" HorizontalAlignment="Stretch" VerticalAlignment="Center"  Background="Gray" />
             <local:SkiaImageViewer Grid.Row="4" x:Name="skiaImageViewer" />

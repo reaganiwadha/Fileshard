@@ -2,8 +2,12 @@
 using Fileshard.Service.Entities;
 using Fileshard.Service.Repository;
 using Fileshard.Service.Structs;
+using Mapster;
 using Microsoft.EntityFrameworkCore;
 using MoreLinq;
+using Nelibur.ObjectMapper;
+using System;
+using System.Linq;
 
 namespace Fileshard.Service.Database
 {
@@ -15,13 +19,19 @@ namespace Fileshard.Service.Database
 
         public CollectionRepository()
         {
+            TinyMapper.Bind<EntityFileshardObject, FileshardObject>();
+
             var config = new MapperConfiguration(cfg => {
-                cfg.CreateMap<EntityFileshardCollection, FileshardCollection>();
-                cfg.CreateMap<EntityFileshardObject, FileshardObject>();
-                cfg.CreateMap<EntityFileshardFile, FileshardFile>();
-                cfg.CreateMap<EntityFileshardFileMeta, FileshardFileMeta>();
-                cfg.CreateMap<FileshardObject, EntityFileshardObject>();
-                cfg.CreateMap<FileshardFile, EntityFileshardFile>();
+                cfg.CreateMap<EntityFileshardCollection, FileshardCollection>(MemberList.Source);
+                cfg.CreateMap<EntityFileshardObject, FileshardObject>(MemberList.Source);
+                cfg.CreateMap<EntityFileshardFile, FileshardFile>(MemberList.Source);
+                cfg.CreateMap<EntityFileshardFileMeta, FileshardFileMeta>(MemberList.Source);
+                cfg.CreateMap<FileshardObject, EntityFileshardObject>(MemberList.Source);
+                cfg.CreateMap<FileshardFile, EntityFileshardFile>(MemberList.Source);
+                cfg.CreateMap<FileshardObjectTag, FileshardObjectTag>(MemberList.Source);
+                cfg.CreateMap<FileshardTag, EntityFileshardTag>(MemberList.Source);
+                cfg.CreateMap<FileshardTagNamespace, EntityFileshardTagNamespace>(MemberList.Source);
+
             });
             _mapper = config.CreateMapper();
         }
@@ -56,6 +66,7 @@ namespace Fileshard.Service.Database
             {
                 existingMeta.Value = value;
                 _dbContext.FileMetas.Update(existingMeta);
+                await _dbContext.SaveChangesAsync();
             }
             else
             {
@@ -82,20 +93,30 @@ namespace Fileshard.Service.Database
             return Task.FromResult(keys.All(key => _dbContext.FileMetas.Any(m => m.Key == key && m.FileId == fileId)));
         }
 
-        public Task<FileshardObject?> GetObject(Guid collectionId, Guid objectId)
+        public async Task<FileshardObject?> GetObject(Guid collectionId, Guid objectId)
         {
             var obj = _dbContext.Objects
                 .Where(o => o.CollectionId == collectionId)
                 .Include(o => o.Files)
                 .ThenInclude(f => f.Metas)
+                .Include(o => o.Tags)
+                .ThenInclude(t => t.Tag)
+                .ThenInclude(t => t.Namespace)
                 .FirstOrDefault(o => o.Id == objectId);
 
             if (obj == null)
             {
-                return Task.FromResult<FileshardObject?>(null);
+                return null;
             }
 
-            return Task.FromResult<FileshardObject?>(_mapper.Map<FileshardObject>(obj));
+            return TinyMapper.Map<EntityFileshardObject, FileshardObject>(obj);
+        }
+
+        public async Task<bool> ObjectHasNamespaceAlready(Guid objectId, String namespaceName) {
+            return await _dbContext.ObjectTags
+                .Where(t => t.ObjectId == objectId)
+                .Where(t => t.Tag.Namespace.Name == namespaceName)
+                .AnyAsync();
         }
 
         public Task<List<String>> FilterNonExistentFiles(List<String> files)
@@ -112,6 +133,7 @@ namespace Fileshard.Service.Database
                 .Where(o => o.Files.Count != 0)
                 .Include(o => o.Files)
                 .ThenInclude(f => f.Metas)
+                // .Include(o => o.Tags)
                 /*.OrderBy(o => o.Files.First().InternalPath)*/
                 .ToListAsync();
 
@@ -122,11 +144,12 @@ namespace Fileshard.Service.Database
                     file.Metas = file.Metas
                         .GroupBy(m => new { m.FileId, m.Key })
                         .Select(g => g.First())
+                        .OrderBy(m => m.Key)
                         .ToList();
                 }
             }
 
-            return _mapper.Map<List<FileshardObject>>(objects.Shuffle());
+            return objects.Select(e => TinyMapper.Map<EntityFileshardObject, FileshardObject>(e)).ToList();
         }
 
         public Task Ingest(Guid collectionId, List<FileshardObject> fileshardObjects)
@@ -155,6 +178,7 @@ namespace Fileshard.Service.Database
             {
                 existingMeta.LongValue = value;
                 _dbContext.FileMetas.Update(existingMeta);
+                await _dbContext.SaveChangesAsync();
             }
             else
             {
@@ -180,6 +204,7 @@ namespace Fileshard.Service.Database
             {
                 existingMeta.TimeValue = value;
                 _dbContext.FileMetas.Update(existingMeta);
+                await _dbContext.SaveChangesAsync();
             }
             else
             {
@@ -194,6 +219,63 @@ namespace Fileshard.Service.Database
                 _dbContext.FileMetas.Add(meta);
                 await _dbContext.SaveChangesAsync();
             }
+        }
+
+        public async Task UpsertObjectTag(string tagNamespace, string tagName, float? weight, Guid objectId)
+        {
+              var existingTag = _dbContext.ObjectTags
+                .FirstOrDefault(t => t.ObjectId == objectId && t.Tag.Namespace.Name == tagNamespace && t.Tag.Name == tagName);
+
+            if (existingTag != null)
+            {
+                existingTag.Weight = weight ?? existingTag.Weight;
+                _dbContext.ObjectTags.Update(existingTag);
+            }
+            else
+            {
+                var tag = _dbContext.Tags
+                    .FirstOrDefault(t => t.Namespace.Name == tagNamespace && t.Name == tagName);
+
+                if (tag == null)
+                {
+                    var tagNamespaceEntity = _dbContext.TagNamespaces
+                        .FirstOrDefault(n => n.Name == tagNamespace);
+
+                    if (tagNamespaceEntity == null)
+                    {
+                        tagNamespaceEntity = new EntityFileshardTagNamespace
+                        {
+                            Id = Guid.NewGuid(),
+                            Name = tagNamespace
+                        };
+
+                        _dbContext.TagNamespaces.Add(tagNamespaceEntity);
+                        await _dbContext.SaveChangesAsync();
+                    }
+
+                    tag = new EntityFileshardTag
+                    {
+                        Id = Guid.NewGuid(),
+                        Name = tagName,
+                        NamespaceId = _dbContext.TagNamespaces.First(n => n.Name == tagNamespace).Id
+                    };
+
+                    _dbContext.Tags.Add(tag);
+                }
+
+                var objectTag = new EntityFileshardObjectTag
+                {
+                    Id = Guid.NewGuid(),
+                    ObjectId = objectId,
+                    TagId = tag.Id,
+                    Weight = weight
+                };
+
+                _dbContext.ObjectTags.Add(objectTag);
+
+            }
+
+            await _dbContext.SaveChangesAsync();
         }
     }
 }

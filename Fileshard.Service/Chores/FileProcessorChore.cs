@@ -45,8 +45,9 @@ namespace Fileshard.Service.Chores
                             String hash = HashUtil.ComputeMD5(file.InternalPath);
                             await _collectionRepository.UpsertMeta("hash:md5", hash, file.Id);
                         }
-                        catch
+                        catch (Exception e)
                         {
+                            throw e;
                         }
                     }
                     try
@@ -61,8 +62,10 @@ namespace Fileshard.Service.Chores
                                 await _collectionRepository.UpsertMeta("image:format", image.Format.ToString(), file.Id);
                             }
                         }
-                    } catch
+                    }
+                    catch (Exception e)
                     {
+                        throw e;
                     }
 
                     // Read file's Date Created and Date Modified
@@ -76,8 +79,9 @@ namespace Fileshard.Service.Chores
                             await _collectionRepository.UpsertMeta("date:modified", dateModified, file.Id);
                         }
                     }
-                    catch
+                    catch (Exception e)
                     {
+                        throw e;
                     }
 
                     try
@@ -97,6 +101,7 @@ namespace Fileshard.Service.Chores
                     }
                     catch (Exception e)
                     {
+                        throw e;
                     }
                 }
 

@@ -1,12 +1,15 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+
 
 namespace Fileshard.Service.Entities
 {
-    internal class EntityFileshardTagNamespace
+    [Table("tag_namespaces")]
+    public class EntityFileshardTagNamespace
     {
+        public Guid Id { get; set; }
+
+        public String Name { get; set; }
+
+        public ICollection<EntityFileshardTag> Tags { get; set; } = new List<EntityFileshardTag>();
     }
 }

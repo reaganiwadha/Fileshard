@@ -23,18 +23,18 @@ namespace Fileshard.Frontend
             this.DialogResult = true;
         }
 
-        private void TxtResponse_PreviewTextInput(object sender, TextCompositionEventArgs e)
+ /*       private void TxtResponse_PreviewTextInput(object sender, TextCompositionEventArgs e)
         {
             e.Handled = !IsTextAllowed(e.Text);
-        }
-
+        }*/
+/*
         private static bool IsTextAllowed(string text)
         {
             Regex regex = new Regex("^[a-zA-Z0-9_]*$"); // Only letters, numbers, and underscores
             return regex.IsMatch(text);
         }
-
-        private void TxtResponse_Pasting(object sender, DataObjectPastingEventArgs e)
+*/
+      /*  private void TxtResponse_Pasting(object sender, DataObjectPastingEventArgs e)
         {
             if (e.DataObject.GetDataPresent(typeof(string)))
             {
@@ -48,6 +48,6 @@ namespace Fileshard.Frontend
             {
                 e.CancelCommand();
             }
-        }
+        }*/
     }
 }

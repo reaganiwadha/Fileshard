@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Fileshard.Service.Entities
 {
     [Table("files")]
-    internal class EntityFileshardFile
+    public class EntityFileshardFile
     {
         public Guid Id { get; set; }
 

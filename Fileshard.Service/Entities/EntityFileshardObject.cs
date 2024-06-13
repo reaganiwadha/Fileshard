@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations.Schema;
 namespace Fileshard.Service.Entities
 {
     [Table("objects")]
-    internal class EntityFileshardObject
+    public class EntityFileshardObject
     {
         public Guid Id { get; set; }
 
@@ -15,6 +15,8 @@ namespace Fileshard.Service.Entities
         public ICollection<EntityFileshardFile> Files { get; set; } = new List<EntityFileshardFile>();
 
         public EntityFileshardCollection Collection { get; set; } = null!;
+
+        public ICollection<EntityFileshardObjectTag> Tags { get; set; } = new List<EntityFileshardObjectTag>();
 
         public Boolean IsImport { get; set; }
 

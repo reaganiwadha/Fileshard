@@ -15,6 +15,7 @@
     <PackageReference Include="FluentMigrator.Runner" Version="5.2.0" />
     <PackageReference Include="FluentMigrator.Runner.SQLite" Version="5.2.0" />
     <PackageReference Include="Magick.NET-Q16-AnyCPU" Version="13.9.1" />
+    <PackageReference Include="Mapster" Version="7.4.0" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" Version="8.0.6" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="8.0.6" />
     <PackageReference Include="morelinq" Version="4.2.0" />
@@ -22,6 +23,7 @@
     <PackageReference Include="Python.Included" Version="3.11.6" />
     <PackageReference Include="pythonnet" Version="3.0.3" />
     <PackageReference Include="ServiceWire" Version="5.5.4" />
+    <PackageReference Include="TinyMapper" Version="3.0.3" />
   </ItemGroup>
 
 </Project>

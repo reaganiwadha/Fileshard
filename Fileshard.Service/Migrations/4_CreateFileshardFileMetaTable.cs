@@ -14,7 +14,7 @@ namespace Fileshard.Service.Migrations
                 .WithColumn("LongValue").AsInt32().Nullable()
                 .WithColumn("Version").AsGuid().NotNullable()
                 .WithColumn("Key").AsString()
-                .WithColumn("Value").AsString();
+                .WithColumn("Value").AsString().Nullable();
         }
 
         public override void Down()

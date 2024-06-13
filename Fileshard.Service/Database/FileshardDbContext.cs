@@ -18,13 +18,15 @@ namespace Fileshard.Service.Database
 
         public DbSet<EntityFileshardFileMeta> FileMetas => Set<EntityFileshardFileMeta>();
 
+        public DbSet<EntityFileshardTag> Tags => Set<EntityFileshardTag>();
+
+        public DbSet<EntityFileshardObjectTag> ObjectTags => Set<EntityFileshardObjectTag>();
+
+        public DbSet<EntityFileshardTagNamespace> TagNamespaces => Set<EntityFileshardTagNamespace>();
+
         public FileshardDbContext()
         {
             Migrate();
-
-            // Bad practice but ok for now
-            /*Database.EnsureCreated();
-            Database.Migrate();*/
         }
 
         private void Migrate()
@@ -53,6 +55,11 @@ namespace Fileshard.Service.Database
                 .WithOne(f => f.FileshardObject)
                 .HasForeignKey(f => f.ObjectId);
 
+            modelBuilder.Entity<EntityFileshardObject>()
+                .HasMany(o => o.Tags)
+                .WithOne(t => t.FileshardObject)
+                .HasForeignKey(t => t.ObjectId);
+
             modelBuilder.Entity<EntityFileshardFile>()
                 .HasMany(f => f.Metas)
                 .WithOne(m => m.FileshardFile)
@@ -67,7 +74,14 @@ namespace Fileshard.Service.Database
                 .HasOne(f => f.FileshardObject)
                 .WithMany(o => o.Files)
                 .HasForeignKey(f => f.ObjectId);
+
+            modelBuilder.Entity<EntityFileshardTagNamespace>()
+                .HasMany(tn => tn.Tags)
+                .WithOne(t => t.Namespace)
+                .HasForeignKey(t => t.NamespaceId);
         }
+
+        
 
         private string GetDatabasePath()
         {

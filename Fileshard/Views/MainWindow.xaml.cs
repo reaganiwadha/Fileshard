@@ -59,6 +59,14 @@ namespace Fileshard
             _viewModel.CreateAndSelectCollection(dialog.ResponseText);
         }
 
+        private async void ProcessObjectTags_Click(object sender, RoutedEventArgs e)
+        {
+            var dialog = new NewCollectionDialog();
+            if (dialog.ShowDialog() != true) return;
+
+            _viewModel.DispatchTagProcessor(dialog.ResponseText);
+        }
+
         private void ProcessMetaHash_Click(object sender, RoutedEventArgs e)
         {
             _viewModel.DispatchMetaHasher();

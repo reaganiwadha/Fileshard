@@ -23,6 +23,8 @@ namespace Fileshard.Frontend.ViewModels
         private float _progress = 0;
         private bool _isBusy = false;
 
+        private string _taggingEndpoint = "";
+
         public ObservableCollection<FileItem> Files { get; set; }
 
         private FileshardObject? _selectedObject;
@@ -162,6 +164,23 @@ namespace Fileshard.Frontend.ViewModels
             ObjectDetailText = $"Selected Object: {_selectedObject.Name} ({_selectedObject.Id})";
         }
 
+        internal void DispatchTagProcessor(String endpoint)
+        {
+            if (_selectedCollection == null)
+            {
+                StatusText = "Please select a collection first";
+                return;
+            }
+
+            var task = new FileTagProcessorChore(_collectionRepository, _selectedCollection.Id, endpoint);
+            Observable.FromAsync(() => task.GetTask())
+                .ObserveOn(RxApp.MainThreadScheduler)
+                .Subscribe(async iterator =>
+                {
+                    ChoreManager.Instance.TryDispatchChore(iterator);
+                });
+        }
+
         internal void DispatchMetaHasher()
         {
             if (_selectedCollection == null)
@@ -213,6 +232,12 @@ namespace Fileshard.Frontend.ViewModels
         {
             get => _objectDetailText;
             set => this.RaiseAndSetIfChanged(ref _objectDetailText, value);
+        }
+
+        public string TaggingEndpoint
+        {
+            get => _taggingEndpoint;
+            set => this.RaiseAndSetIfChanged(ref _taggingEndpoint, value);
         }
 
         public string StatusCollectionText

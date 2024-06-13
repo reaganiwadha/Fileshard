@@ -1,10 +1,8 @@
 ﻿using Fileshard.Service.Structs;
 using System.Windows.Controls;
 using System.Windows;
-using System.Xml;
 using Microsoft.Msagl.Drawing;
 using Fileshard.Frontend.Helpers;
-using Microsoft.Msagl.Layout.MDS;
 using Microsoft.Msagl.Core.Routing;
 
 namespace Fileshard.Frontend.Components { 
@@ -59,7 +57,17 @@ namespace Fileshard.Frontend.Components {
 
                 graph.AddNode("files");
                 graph.AddEdge(_selectedObject.Id.ToString(), "files");
-
+/*
+                graph.AddNode("tags");
+                graph.AddEdge(_selectedObject.Id.ToString(), "tags");*/
+/*
+                foreach (var tag in _selectedObject.Tags)
+                {
+                    var tagName = tag.Tag.Name.WrapAt(20).JoinLines();
+                    graph.AddNode(tagName);
+                    graph.AddEdge("tags", tagName);
+                }
+*/
                 foreach (var file in _selectedObject.Files)
                 {
                     graph.AddNode(file.Id.ToString());

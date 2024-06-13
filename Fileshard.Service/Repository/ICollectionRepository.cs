@@ -21,6 +21,8 @@ namespace Fileshard.Service.Repository
 
         Task UpsertMeta(String key, long value, Guid fileId);
 
+        Task UpsertObjectTag(String tagNamespace, String tagName, float? value, Guid objectId);
+
         Task<List<FileshardObject>> GetObjects(Guid collectionId);
 
         Task<FileshardObject?> GetObject(Guid collectionId, Guid objectId);
@@ -28,5 +30,7 @@ namespace Fileshard.Service.Repository
         Task<List<String>> FilterNonExistentFiles(List<String> files);
 
         Task<bool> IsEmpty();
+
+        Task<bool> ObjectHasNamespaceAlready(Guid objectId, string namespaceName);
     }
 }
